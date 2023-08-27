@@ -1,0 +1,14 @@
+
+bin/AnyCPU
+src/.vs
+src/*/bin
+src/*/obj
+src/packages
+tests/output
+examples/*/bin
+examples/*/obj
+*.exe
+*.dll
+*.nupkg
+docs/automation.generativeai.stores.data.md
+docs/automation.generativeai.stores.embeddingresult.md

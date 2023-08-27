@@ -1,0 +1,56 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="ListViewItem"
+           x:Key="ChatItem">
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#292b2F"/>
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Background" Value="#393B40"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border Name="MessageBorder" MinHeight="40" MinWidth="200" MaxWidth="800" BorderThickness="1" Background="#EFEBE9" 
+                    Margin="10,0,60,10" BorderBrush="#BCAAA4" CornerRadius="4" SnapsToDevicePixels="True"
+                    HorizontalAlignment="Left">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="15"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="MessageTxtBlock" Grid.Row="0" Margin="7,5,7,0" TextWrapping="Wrap" 
+                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                               Text="{Binding Message}"/>
+                            <TextBlock Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Stretch"
+                               Margin="0,0,5,0" FontSize="10" Opacity="0.8"
+                               Text="{Binding Time, StringFormat={}{0:t}}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsOriginNative}" Value="True">
+                            <Setter TargetName="MessageBorder" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="MessageBorder" Property="Margin" Value="60,0,10,10"/>
+                            <Setter TargetName="MessageBorder" Property="Background" Value="#BBDEFB"/>
+                            <Setter TargetName="MessageBorder" Property="BorderBrush" Value="#64B5F6"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Message}" Value="{x:Null}">
+                            <Setter TargetName="MessageTxtBlock" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="MessageBorder" Property="MaxWidth" Value="320"/>
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Message}" Value="{x:Null}"/>
+                                <Condition Binding="{Binding IsOriginNative}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter TargetName="MessageBorder" Property="Margin" Value="0,0,10,10"/>
+                                <Setter TargetName="MessageBorder" Property="HorizontalAlignment" Value="Right"/>
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

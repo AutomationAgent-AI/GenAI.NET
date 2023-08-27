@@ -1,0 +1,62 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    <Style TargetType="ListViewItem"
+           x:Key="ChatSessions">
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#292b2F"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="Black"/>
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Background" Value="#393B40"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border Background="{TemplateBinding Background}"
+                            Height="50" Width="150"
+                            CornerRadius="4"
+                            Margin="8,2,8,2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="10,0,0,0">
+                                <Rectangle Width="20" Height="20" VerticalAlignment="Center">
+                                    <Rectangle.Fill>
+                                        <ImageBrush ImageSource="../Images/speechicon.png"/>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Label Content="{Binding Name}" VerticalAlignment="Center" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                                        HorizontalAlignment="Right" 
+                                        Margin="0,0,5,5"
+                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}, Path=IsMouseOver, Converter={StaticResource BoolToVis}}">
+                                <!--<Button Content="🖉" VerticalAlignment="Top"
+                                        BorderThickness="0" 
+                                        FontSize="10" 
+                                        Background="Transparent"
+                                        Foreground="LightGray"
+                                        ToolTip="Edit Session"
+                                        Command="{Binding DataContext.RenameChatSession, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Name}"/>-->
+                                <Button Content="X" VerticalAlignment="Top" 
+                                        BorderThickness="0" 
+                                        FontSize="10" 
+                                        Background="Transparent"
+                                        Foreground="LightGray"
+                                        ToolTip="Delete Session"
+                                        Command="{Binding DataContext.DeleteChatSession, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Name}"
+                                        Visibility="{Binding DataContext.CanDeleteSession, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Converter={StaticResource BoolToVis}}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

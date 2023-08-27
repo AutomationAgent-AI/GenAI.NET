@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>GenAI.NET</id>
+        <version>1.0.8626.20106</version>
+        <authors>Automation Agent</authors>
+        <owners>Automation Agent</owners>
+        <projectUrl>https://github.com/automaze1/GenAI.NET</projectUrl>
+		<icon>images\icon.png</icon>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Assemblies required to create a generative AI application that can interact with a large language model. Contains the following files:
+        1) GenerativeAI.dll
+		2) GenerativeAI.UX.dll
+        </description>
+        <summary>This package provides a library to create generative AI applications.</summary>
+        <copyright>Copyright Automation Agent 2023</copyright>
+        <dependencies>
+            <group targetFramework=".NETFramework4.7.2">
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\bin\AnyCPU\Release\GenerativeAI.dll" target="lib\net472" />
+		<file src="..\bin\AnyCPU\Release\GenerativeAI.xml" target="lib\net472" />
+		<file src="..\bin\AnyCPU\Release\GenerativeAI.UX.dll" target="lib\net472" />
+		<file src="..\bin\AnyCPU\Release\GenerativeAI.UX.xml" target="lib\net472" />
+		<file src=".\icon.png" target="images\" />
+    </files>
+</package>
