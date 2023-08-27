@@ -8,6 +8,8 @@ A .NET library to interact with Large Language Models such as OpenAI. This libra
 - DLLFunctionToolset: Wraps all the public static methods of a .NET class from a given DLL into a function toolset. This module refers to the documentation of the static methods to create function descriptions.
 - PromptTemplate: Helps you to parameterize your prompts with a template string. You can define a template string with the template variables denoted as {{ $input }}
 - Pipeline: Helps to create a pipeline of tools to execute them sequentially.
+- MapReduceTool: Helps to process large data set with a mapper tool in parallel and then reduce to the final output.
+- SearchTool: Helps to do a web search using Bing API
 
 ## API Documentation
 [Documentation](https://github.com/automaze1/GenAI.NET/blob/main/docs/index.md)
@@ -156,4 +158,52 @@ context.TryGetResult(tools.First().Name, out title);
 Console.WriteLine($"TITLE: {title}");
 Console.WriteLine();
 Console.WriteLine(outline);
+```
+### MapReduce Tool
+You can use the MapReduce tool to map a large array of input data using a mapper tool and finally reduce them to final output using a reducer tool. The mapper runs in parallel, hence it is important to use the mapper tool that is threadsafe.
+
+```csharp
+//Prompt tool that takes 3 input variables to create a sentence.
+var prompt = PromptTool.WithTemplate("The capital of {{$state}} is {{$city}} and '{{$language}}' is the most popular language there.");
+
+//Combines a given array of text by joining the text with a new line.
+var combine = new CombineTool();
+//Create a MapReduce tool
+var mapreduce = MapReduceTool.WithMapperReducer(prompt, combine);
+
+var context = new ExecutionContext();
+
+//The context has an array of data for each input variable from the mapper tool.
+context["state"] = new[] { "UP", "Bihar", "Jharkhand", "MP" };
+context["city"] = new[] { "Lucknow", "Patna", "Ranchi", "Bhopal" };
+context["language"] = new[] { "Hindi", "Bhojpuri", "Santhal", "Hindi" };
+
+var result = await mapreduce.ExecuteAsync(context);
+
+Console.WriteLine(result);
+Console.ReadLine();
+```
+
+### Search Tool
+
+```csharp
+//Get Bing API key
+string apiKey = "";
+
+//Create Bing Search tool with max result count 5
+var tool = SearchTool.ForBingSearch(apiKey).WithMaxResultCount(5);
+
+var context = new ExecutionContext();
+context[tool.Descriptor.InputParameters.First()] = "What is the latest update on India's moon mission?";
+
+//Execute the search query
+var result = await tool.ExecuteAsync(context);
+
+Console.WriteLine(result);
+```
+
+#### Output:
+
+```JSON
+[{"content":"India\u0027s Chandrayaan-3 spacecraft is looking to become the first ever to land on the moon\u0027s south pole, just days after a Russian attempt ended in a crash. The region\u0027s shadowed craters are believed to contain water ice that could help make a permanent lunar base for humans a reality. Wednesday 23 August 2023 11:25, UK India LIVE","reference":"https://news.sky.com/story/india-moon-landing-live-updates-chandrayaan-3-making-historic-bid-to-reach-south-pole-of-lunar-surface-12945600"},{"content":"Chandrayaan-3, India's latest mission to the moon, is set to undertake its key final stage today as the unmanned spacecraft attempts a soft landing on the lunar surface - 40 days after its...","reference":"https://techcrunch.com/2023/08/22/chandrayaan-3-landing-moon-live/"},{"content":"Chandrayaan-3 Moon Landing Successful: India has created history as it became the first country to land on the South Pole of lunar surface. PM Modi congratulated Indians and space scientists...","reference":"https://www.livemint.com/science/news/chandrayaan3-live-updates-chandrayaan-landing-time-india-isro-lunar-landing-isro-moon-mission-vikram-lander-space-news-11692751244259.html"},{"content":"India Moon Landing In Latest Moon Race, India Aims to Claim First Successful Southern Pole Landing Days after a Russian lunar landing failed, India will try to explore with its...","reference":"https://www.nytimes.com/live/2023/08/23/science/india-moon-landing-chandrayaan-3"}]
 ```
