@@ -6,12 +6,13 @@
       <Field Name="aiservice" Hidden="true" />
       <Method Name="GetFiles" Hidden="true" />
       <Method Name="GetTextProviderService" Hidden="true" />
+      <Field Name="languageModel" Hidden="true" />
       <Property Name="LanguageModel" Hidden="true" />
       <Method Name="SetLanguageModel" Hidden="true" />
       <Field Name="txtservice" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAQBAAAAAJAAQAACAAQAAQAAAQEAAAAAAAAAKgAAAA=</HashCode>
+      <HashCode>AAAABAAIAAJAAQAACAAQAAQAAAQAAAAAAAAAAKgQAgA=</HashCode>
       <FileName>Application.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -20,43 +21,52 @@
     <Members>
       <Field Name="classname" Hidden="true" />
       <Field Name="dllpath" Hidden="true" />
-      <Field Name="functions" Hidden="true" />
       <Method Name="GetData" Hidden="true" />
       <Method Name="GetDocumentation" Hidden="true" />
-      <Method Name="GetParameterOptions" Hidden="true" />
+      <Method Name="GetElementType" Hidden="true" />
+      <Method Name="GetMethods" Hidden="true" />
+      <Method Name="GetObjectTypeDescriptor" Hidden="true" />
       <Method Name="GetParameterType" Hidden="true" />
       <Method Name="GetReturns" Hidden="true" />
       <Method Name="GetSummary" Hidden="true" />
+      <Method Name="GetTools" Hidden="true" />
+      <Method Name="IEnumerable.GetEnumerator" Hidden="true" />
+      <Method Name="IsEnumerable" Hidden="true" />
       <Field Name="loadedXmlDocumentation" Hidden="true" />
       <Method Name="LoadXmlDocumentation" Hidden="true" />
-      <Method Name="ParsePrameterValue" Hidden="true" />
-      <Field Name="staticmethods" Hidden="true" />
+      <Field Name="tools" Hidden="true" />
       <Method Name="XmlDocumentationKeyHelper" Hidden="true" />
     </Members>
+    <NestedTypes>
+      <Class Name="Automation.GenerativeAI.DLLFunctionTools.Tool" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Tools\DLLFunctionTools.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>QAAAAIIAFAABAAwABiCAAAICABAAAAAAAAAAQAAAAAQ=</HashCode>
-      <FileName>DLLFunctionTools.cs</FileName>
+      <HashCode>QAAAAIIAEAQAABgALCDAAAICABBAAAAkAAAAAAAAAEQ=</HashCode>
+      <FileName>Tools\DLLFunctionTools.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Automation.GenerativeAI.ParameterDescriptor">
     <Position X="12.25" Y="1.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAEgAAAAAAAAAAQAAAAAAAAAAQAAAABAAAA=</HashCode>
-      <FileName>FunctionDescriptor.cs</FileName>
+      <HashCode>AAAAAAAAAAEgAAAAAAAAAAQAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Tools\FunctionDescriptor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Automation.GenerativeAI.FunctionDescriptor">
     <Position X="14.25" Y="4.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAAAIAAAAAAAAA=</HashCode>
-      <FileName>FunctionDescriptor.cs</FileName>
+      <HashCode>AAAAAAAAAAAgAAQAAAAAAAQAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Tools\FunctionDescriptor.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Automation.GenerativeAI.OpenAILanguageModel" BaseTypeListCollapsed="true">
-    <Position X="7.75" Y="3.75" Width="2.25" />
+  <Class Name="Automation.GenerativeAI.LLM.OpenAILanguageModel" BaseTypeListCollapsed="true">
+    <Position X="8.5" Y="4.5" Width="2.25" />
     <Members>
-      <Field Name="apiKey" Hidden="true" />
       <Field Name="apiUrl" Hidden="true" />
       <Field Name="model" Hidden="true" />
       <Method Name="ToFunctions" Hidden="true" />
@@ -64,16 +74,16 @@
       <Method Name="ToLLMResponse" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAQAAAAAACAAAAACAAAAAAEAAAAAAAAAAgYAAA=</HashCode>
-      <FileName>OpenAILanguageModel.cs</FileName>
+      <HashCode>AAAAAAAQAAAAAAAAAAAACAAAAAAEAAAAAAAAAAgYAoA=</HashCode>
+      <FileName>LLM\OpenAILanguageModel.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Automation.GenerativeAI.TextObject" BaseTypeListCollapsed="true">
+  <Class Name="Automation.GenerativeAI.Interfaces.TextObject" BaseTypeListCollapsed="true">
     <Position X="14.5" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AEAAgAAAAAAAAAAAAAIAAAQAAAAAAEAAAAAACAAAQAA=</HashCode>
-      <FileName>TextProviderService.cs</FileName>
+      <FileName>Interfaces\TextObject.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -81,133 +91,119 @@
     <Position X="5" Y="4" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\ChatMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Automation.GenerativeAI.Interfaces.FunctionMessage">
     <Position X="4.25" Y="6" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\ChatMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Automation.GenerativeAI.Interfaces.FunctionCallMessage">
     <Position X="6.5" Y="6" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\ChatMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Automation.GenerativeAI.Interfaces.LLMResponse">
     <Position X="10" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\ChatMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="Automation.GenerativeAI.ILogger" Collapsed="true">
-    <Position X="28.5" Y="1.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
-      <FileName>Logger.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="Automation.GenerativeAI.ITextObjectProvider" Collapsed="true">
-    <Position X="33.75" Y="1.25" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAIAAAAAAAA=</HashCode>
-      <FileName>TextProviderService.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.ILanguageModel" Collapsed="true">
     <Position X="33.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAgA=</HashCode>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.IVectorTransformer">
     <Position X="2.5" Y="4.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.IMatchedObject" Collapsed="true">
     <Position X="30.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAgAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.ITextObject" Collapsed="true">
     <Position X="32" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAQAAAAAAAAAAAAACAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.IVectorStore">
-    <Position X="0.75" Y="4.5" Width="1.5" />
+    <Position X="0.5" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.IFunctionToolSet">
     <Position X="25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAKCAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.IConversation">
     <Position X="5.25" Y="1.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAABAAgAAAAAAAEAAAAAAAAAIAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <HashCode>AAACAAAAAAAAAAAABAAgAAAAAAAAAAAAAAAAAIAAAgA=</HashCode>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Automation.GenerativeAI.Interfaces.IGenerativeAIService">
     <Position X="2.75" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAABAAAAAAAAAAIAAAAAACCAAgAAAAAAACAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Enum Name="Automation.GenerativeAI.LogLevel" Collapsed="true">
+  <Enum Name="Automation.GenerativeAI.Utilities.LogLevel" Collapsed="true">
     <Position X="28.5" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAwAAAAAAABAAAAAAAAAAAAAAAEAAAAA=</HashCode>
-      <FileName>Logger.cs</FileName>
+      <FileName>Utilities\Logger.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="Automation.GenerativeAI.LogOps" Collapsed="true">
+  <Enum Name="Automation.GenerativeAI.Utilities.LogOps" Collapsed="true">
     <Position X="30.25" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEAAAAAAAhAAAAAACAABAQAAAAAgEAAgABACAAAAAA=</HashCode>
-      <FileName>Logger.cs</FileName>
+      <FileName>Utilities\Logger.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Automation.GenerativeAI.Interfaces.ResponseType" Collapsed="true">
     <Position X="32" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAEAAAAEAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\ChatMessage.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Automation.GenerativeAI.Interfaces.Role" Collapsed="true">
     <Position X="33.75" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAACACgAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\ChatMessage.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Automation.GenerativeAI.Interfaces.TransformerType" Collapsed="true">
     <Position X="28.5" Y="3.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Interfaces.cs</FileName>
+      <FileName>Interfaces\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Font Name="Segoe UI" Size="9" />
