@@ -82,7 +82,7 @@ namespace ConsoleChatApplication
                                 IVectorStore store = null;
                                 if (!File.Exists(vdbpath))
                                 {
-                                    store = Application.SaveForSemanticSearch(path, vdbpath);
+                                    store = Application.CreateVectorDatabaseForSemanticSearch(path, vdbpath);
                                 }
                                 else
                                 {

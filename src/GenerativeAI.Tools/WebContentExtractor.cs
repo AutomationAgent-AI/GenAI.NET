@@ -80,6 +80,7 @@ namespace Automation.GenerativeAI.Tools
         /// </summary>
         /// <param name="node">The HTML node to convert.</param>
         /// <param name="outText">The writer to output the text to.</param>
+        /// <param name="counters"></param>
         private static void ConvertTo(HtmlNode node, TextWriter outText, Dictionary<HtmlNode, int> counters)
         {
             string html;

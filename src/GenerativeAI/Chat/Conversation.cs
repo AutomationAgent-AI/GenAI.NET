@@ -79,7 +79,7 @@ QUESTION:
             store = ctxstore;
         }
 
-        private static ChatMessage MessgeFromResponse(LLMResponse response)
+        internal static ChatMessage MessgeFromResponse(LLMResponse response)
         {
             switch (response.Type)
             {
@@ -191,15 +191,19 @@ QUESTION:
             return messages.Last();
         }
 
-        public void AddToolSet(IFunctionToolSet toolSet)
+        internal static ChatMessage GetFunctionCallSystemMessage()
         {
-            //update system message to extract data using toolset
-            systemMessage = new ChatMessage(Role.system,
-                $@"You are an intelligent assistant. Think step by step and analyze the input 
+            return new ChatMessage(Role.system, $@"You are an intelligent assistant. Think step by step and analyze the input 
                   request to check if any function call is required, if so extract all
                   parameters based on the function sepcification. Extract arguments and values
                   only based on function specification provided, do not include extra parameter. 
                   Today's date: {DateTime.Today}");
+        }
+
+        public void AddToolSet(IFunctionToolSet toolSet)
+        {
+            //update system message to extract data using toolset
+            systemMessage = GetFunctionCallSystemMessage();
 
             this.tool = toolSet;
         }

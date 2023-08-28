@@ -21,7 +21,7 @@ namespace Automation.GenerativeAI.Tools
         /// <summary>
         /// Default constructor
         /// </summary>
-        protected PromptTool() { }
+        protected PromptTool() { Name = "PromptTool"; Description = "Renders a prompt template to a string using input variable values."; }
 
         /// <summary>
         /// Creates a new instance of PrompTool with template string

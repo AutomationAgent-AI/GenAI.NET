@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Automation.GenerativeAI.Tools
 {
+    /// <summary>
+    /// A tool to combine a list of strings.
+    /// </summary>
     public class CombineTool : FunctionTool
     {
         private ParameterDescriptor input = new ParameterDescriptor() { 
@@ -13,10 +16,22 @@ namespace Automation.GenerativeAI.Tools
             Required = true,
         };
 
-        public CombineTool() 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        private CombineTool() 
         { 
             Name = "Combine";
             Description = "Combines a list of string into a single string using newline";
+        }
+
+        /// <summary>
+        /// Creates a new instance of the Combine Tool
+        /// </summary>
+        /// <returns>CombineTool</returns>
+        public static CombineTool Create()
+        {
+            return new CombineTool();
         }
 
         protected override async Task<Result> ExecuteCoreAsync(ExecutionContext context)

@@ -196,7 +196,7 @@ namespace GenAIFramework.Test
             var destination = Path.Combine(RootPath, @"..\..\..\..\..\tests\output\article.vdb");
             if(File.Exists(destination)) { File.Delete(destination); }
 
-            var result = GenerativeApp.SaveForSemanticSearch(source, destination);
+            var result = GenerativeApp.CreateVectorDatabaseForSemanticSearch(source, destination);
 
             Assert.IsNotNull(result);
             Assert.IsTrue(File.Exists(destination));

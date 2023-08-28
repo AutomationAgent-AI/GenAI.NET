@@ -186,7 +186,7 @@ namespace GenAIFramework.Test
         public async Task PDFTextExtractionTool()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "PDFTextExtractionTool");
-            var tool = new TextExtractorTool();
+            var tool = TextExtractorTool.Create();
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
@@ -245,7 +245,7 @@ namespace GenAIFramework.Test
         public async Task FolderTextExtractionTool()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "FolderTextExtractionTool");
-            var tool = new TextExtractorTool();
+            var tool = TextExtractorTool.Create();
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
@@ -409,7 +409,7 @@ namespace GenAIFramework.Test
 
             var prompt = PromptTool.WithTemplate("The capital of {{$state}} is {{$city}} and '{{$language}}' is the most popular language there.");
 
-            var combine = new CombineTool();
+            var combine = CombineTool.Create();
 
             var mapreduce = MapReduceTool.WithMapperReducer(prompt, combine);
             Assert.IsNotNull(mapreduce);

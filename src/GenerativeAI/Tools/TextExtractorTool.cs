@@ -16,7 +16,7 @@ namespace Automation.GenerativeAI.Tools
         /// <summary>
         /// Constructor for TextExtractorTool
         /// </summary>
-        public TextExtractorTool()
+        private TextExtractorTool()
         {
             Name = "TextExtractor";
             Description = "Extracts text from a given one or more source text file or pdf from a directory";
@@ -26,6 +26,15 @@ namespace Automation.GenerativeAI.Tools
                 Type = TypeDescriptor.StringType,
                 Description = "Full path of the source file or folder from where text needs to be extracted"
             };
+        }
+
+        /// <summary>
+        /// Creates a TextExtractorTool
+        /// </summary>
+        /// <returns>TextExtractorTool</returns>
+        public static TextExtractorTool Create()
+        {
+            return new TextExtractorTool();
         }
 
         internal static List<ITextObject> ExtractTextObjects(string source)

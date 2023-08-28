@@ -25,6 +25,8 @@ namespace Automation.GenerativeAI.Tools
             return name;
         }
 
+        internal ToolsCollection() { toolsDictionary = new Dictionary<string, IFunctionTool>(); }
+
         /// <summary>
         /// Constructs the ToolsCollection with a single tool.
         /// </summary>

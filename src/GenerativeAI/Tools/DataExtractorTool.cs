@@ -115,14 +115,15 @@ namespace Automation.GenerativeAI.Tools
                     var r = await searchtoool.SearchAsync($"{item.Name}:{item.Description}");
 
                     var msg = $@"Extract arguments and values from the following text only based on function specification provided, 
-                                  do not include extra parameter. 
+                                  do not include extra parameter and if the data is not available in the text return empty text. 
+                                  PLEASE DO NOT MAKE UP DATA!!. 
                                   {string.Join("\n", r.Select(x => x.content))}
                                   Today's date: {DateTime.Today}";
 
                     var func = new FunctionDescriptor(Name, "Extracts parameters", Enumerable.Repeat(item, 1));
 
                     var chatmsg = new ChatMessage(Role.user, msg);
-                    var response = await languageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, 0.8);
+                    var response = await languageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, 0.5);
                     if(response.Type == ResponseType.FunctionCall)
                     {
                         var arguments = GetArgumentValues(response);
@@ -137,14 +138,15 @@ namespace Automation.GenerativeAI.Tools
             else
             {
                 var msg = $@"Extract arguments and values from the following text only based on function specification provided, 
-                                  do not include extra parameter. 
+                                  do not include extra parameter and if the data is not available in the text return empty text. 
+                                  PLEASE DO NOT MAKE UP DATA!!. 
                                   {text}
                                   Today's date: {DateTime.Today}";
 
                 var func = new FunctionDescriptor(Name, "Extracts parameters", parameters);
 
                 var chatmsg = new ChatMessage(Role.user, msg);
-                var response = await LanguageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, 0.8);
+                var response = await LanguageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, 0.5);
                 if (response.Type == ResponseType.FunctionCall)
                 {
                     var arguments = GetArgumentValues(response);
