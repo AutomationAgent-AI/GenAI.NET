@@ -5,7 +5,7 @@ Namespace: Automation.GenerativeAI.Tools
 Represents a simple collection of tools as a toolset
 
 ```csharp
-public class ToolsCollection : Automation.GenerativeAI.Interfaces.IFunctionToolSet, System.Collections.Generic.IEnumerable`1[[Automation.GenerativeAI.Interfaces.IFunctionTool, GenerativeAI, Version=1.0.8639.289, Culture=neutral, PublicKeyToken=null]], System.Collections.IEnumerable
+public class ToolsCollection : Automation.GenerativeAI.Interfaces.IFunctionToolSet, System.Collections.Generic.IEnumerable`1[[Automation.GenerativeAI.Interfaces.IFunctionTool, GenerativeAI, Version=1.0.8640.40506, Culture=neutral, PublicKeyToken=null]], System.Collections.IEnumerable
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ToolsCollection](./automation.generativeai.tools.toolscollection.md)<br>

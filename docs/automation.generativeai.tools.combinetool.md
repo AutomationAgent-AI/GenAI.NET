@@ -2,6 +2,8 @@
 
 Namespace: Automation.GenerativeAI.Tools
 
+A tool to combine a list of strings.
+
 ```csharp
 public class CombineTool : FunctionTool, Automation.GenerativeAI.Interfaces.IFunctionTool
 ```
@@ -47,15 +49,20 @@ public FunctionDescriptor Descriptor { get; }
 
 [FunctionDescriptor](./automation.generativeai.functiondescriptor.md)<br>
 
-## Constructors
+## Methods
 
-### **CombineTool()**
+### **Create()**
+
+Creates a new instance of the Combine Tool
 
 ```csharp
-public CombineTool()
+public static CombineTool Create()
 ```
 
-## Methods
+#### Returns
+
+[CombineTool](./automation.generativeai.tools.combinetool.md)<br>
+CombineTool
 
 ### **ExecuteCoreAsync(ExecutionContext)**
 

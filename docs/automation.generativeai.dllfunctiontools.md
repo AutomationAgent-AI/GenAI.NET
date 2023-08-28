@@ -7,7 +7,7 @@ Implements a FunctionToolSet for a .net dll. Using reflection it
  to provide it as toolset.
 
 ```csharp
-public class DLLFunctionTools : Automation.GenerativeAI.Interfaces.IFunctionToolSet, System.Collections.Generic.IEnumerable`1[[Automation.GenerativeAI.Interfaces.IFunctionTool, GenerativeAI, Version=1.0.8639.289, Culture=neutral, PublicKeyToken=null]], System.Collections.IEnumerable
+public class DLLFunctionTools : Automation.GenerativeAI.Interfaces.IFunctionToolSet, System.Collections.Generic.IEnumerable`1[[Automation.GenerativeAI.Interfaces.IFunctionTool, GenerativeAI, Version=1.0.8640.40506, Culture=neutral, PublicKeyToken=null]], System.Collections.IEnumerable
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DLLFunctionTools](./automation.generativeai.dllfunctiontools.md)<br>

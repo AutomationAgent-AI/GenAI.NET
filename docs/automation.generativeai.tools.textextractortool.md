@@ -49,17 +49,20 @@ public FunctionDescriptor Descriptor { get; }
 
 [FunctionDescriptor](./automation.generativeai.functiondescriptor.md)<br>
 
-## Constructors
+## Methods
 
-### **TextExtractorTool()**
+### **Create()**
 
-Constructor for TextExtractorTool
+Creates a TextExtractorTool
 
 ```csharp
-public TextExtractorTool()
+public static TextExtractorTool Create()
 ```
 
-## Methods
+#### Returns
+
+[TextExtractorTool](./automation.generativeai.tools.textextractortool.md)<br>
+TextExtractorTool
 
 ### **ExtractTextObjects(String)**
 
