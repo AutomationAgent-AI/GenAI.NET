@@ -39,7 +39,7 @@ A list of messages as a history. The Response is generated for
  the last message using the history of messages as context.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
+A value between 0 to 1, that controls randomness of the response. 
  Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
 
 #### Returns
@@ -67,7 +67,7 @@ A list of function descriptors to match if the request resolves
  to function calling.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
+A value between 0 to 1, that controls randomness of the response. 
  Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
 
 #### Returns

@@ -104,7 +104,7 @@ Task<ChatMessage> GetResponseAsync(double temperature)
 #### Parameters
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
+A value between 0 to 1, that controls randomness of the response. 
  Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
 
 #### Returns

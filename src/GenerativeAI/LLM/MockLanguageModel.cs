@@ -44,8 +44,7 @@ namespace Automation.GenerativeAI.LLM
         /// Gets the response for given list of chat messages
         /// </summary>
         /// <param name="messages">List of chat messages</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
-        /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
+        /// <param name="temperature">Not in use.</param>
         /// <returns>An LLMResponse response object</returns>
         public async Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, double temperature)
         {
@@ -84,8 +83,7 @@ namespace Automation.GenerativeAI.LLM
         /// the last message using the history of messages as context.</param>
         /// <param name="functions">A list of function descriptors to match if the request resolves 
         /// to function calling.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
-        /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
+        /// <param name="temperature">Not in use.</param>
         /// <returns>An LLMResponse response object</returns>
         public LLMResponse GetResponse(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)
         {
@@ -124,8 +122,7 @@ namespace Automation.GenerativeAI.LLM
         /// the last message using the history of messages as context.</param>
         /// <param name="functions">A list of function descriptors to match if the request resolves 
         /// to function calling.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
-        /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
+        /// <param name="temperature">Not in use.</param>
         /// <returns>An LLMResponse response object</returns>
         public async Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)
         {

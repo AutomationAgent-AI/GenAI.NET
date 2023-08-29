@@ -21,12 +21,61 @@ namespace Automation.GenerativeAI.Tools
 
             var doc = htmlweb.Load(url);
 
+            //search the root content
+            var nodes = doc.DocumentNode.SelectNodes(@"//div[@id='mw-content-text']");
+            if (nodes == null || nodes.Count == 0)
+            {
+                nodes = new HtmlNodeCollection(doc.DocumentNode)
+                {
+                    doc.DocumentNode
+                };
+            }
+
             using (var sw = new StringWriter())
             {
-                // Convert the HTML string to plain text
-                ConvertTo(node: doc.DocumentNode,
-                          outText: sw,
-                          counters: new Dictionary<HtmlNode, int>());
+                foreach (var node in nodes)
+                {
+                    // Convert the HTML string to plain text
+                    ConvertTo(node: node,
+                              outText: sw,
+                              counters: new Dictionary<HtmlNode, int>());
+                }
+
+                sw.Flush();
+                return sw.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Extracts or parses the text content from a given html content.
+        /// </summary>
+        /// <param name="html">A string containing HTML document.</param>
+        /// <returns>The plain text version of the HTML content.</returns>
+        public static string GetTextFromHtml(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            
+            //search the root content
+            var nodes = doc.DocumentNode.SelectNodes(@"//div[@id='mw-content-text']");
+            if (nodes == null || nodes.Count == 0)
+            {
+                nodes = new HtmlNodeCollection(doc.DocumentNode)
+                {
+                    doc.DocumentNode
+                };
+            }
+
+            using (var sw = new StringWriter())
+            {
+                foreach(var node in nodes)
+                {
+                    // Convert the HTML string to plain text
+                    ConvertTo(node: node,
+                              outText: sw,
+                              counters: new Dictionary<HtmlNode, int>());
+                }
+                
                 sw.Flush();
                 return sw.ToString();
             }

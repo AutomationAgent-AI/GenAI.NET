@@ -70,6 +70,44 @@ public static DataExtractorTool Create()
 #### Returns
 
 [DataExtractorTool](./automation.generativeai.tools.dataextractortool.md)<br>
+A new DataExtractorTool
+
+### **WithPrompt(String)**
+
+Allows user to modify the default extractor prompt. The default prompt is as follows:
+ "Extract arguments and values from the following text only based on function specification 
+ provided, do not include extra parameter. {{$text}}"
+
+```csharp
+public DataExtractorTool WithPrompt(string promptTemplate)
+```
+
+#### Parameters
+
+`promptTemplate` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Prompt template string with one input variable.
+
+#### Returns
+
+[DataExtractorTool](./automation.generativeai.tools.dataextractortool.md)<br>
+Updated DataExtractorTool
+
+### **WithTemperature(Double)**
+
+Allows user to override the temperature setting for data extraction. The default value is 0.8
+
+```csharp
+public DataExtractorTool WithTemperature(double temperature)
+```
+
+#### Parameters
+
+`temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+A value between 0 and 1 to control the randomness of the response.
+
+#### Returns
+
+[DataExtractorTool](./automation.generativeai.tools.dataextractortool.md)<br>
 
 ### **WithLanguageModel(ILanguageModel)**
 

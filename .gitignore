@@ -12,3 +12,4 @@ examples/*/obj
 *.nupkg
 docs/automation.generativeai.stores.data.md
 docs/automation.generativeai.stores.embeddingresult.md
+build/GenerativeAI/

@@ -59,7 +59,11 @@ namespace Automation.GenerativeAI.Tools
         /// <returns>The updated FunctionTool object</returns>
         public FunctionTool WithDescription(string description)
         {
-            Description = description; return this;
+            if(!string.IsNullOrEmpty(description))
+            {
+                Description = description;
+            }
+            return this;
         }
 
         /// <summary>
@@ -231,6 +235,7 @@ namespace Automation.GenerativeAI.Tools
         /// <returns>JSON string</returns>
         public static string ToJsonString(object obj)
         {
+            if(obj == null) return string.Empty;
             if (obj is string || obj.GetType().IsValueType) return obj.ToString();
 
             var serializer = new JavaScriptSerializer();

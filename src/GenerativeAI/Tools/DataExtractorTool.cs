@@ -1,4 +1,5 @@
-﻿using Automation.GenerativeAI.Interfaces;
+﻿using Automation.GenerativeAI.Chat;
+using Automation.GenerativeAI.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,13 +14,50 @@ namespace Automation.GenerativeAI.Tools
     /// </summary>
     public class DataExtractorTool : FunctionTool
     {
+        private readonly int ChunkingThreshold = 3000;
+        private readonly int ChunkSize = 2000;
+        private readonly int ChunkOverlap = 200;
+
         /// <summary>
         /// Creates basic DataExtractorTool
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A new DataExtractorTool</returns>
         public static DataExtractorTool Create()
         {
             return new DataExtractorTool() { Name = "DataExtractor" };
+        }
+
+        private PromptTemplate extratorPrompt = new PromptTemplate("Extract arguments and values from the following text only based on function specification provided, do not include extra parameter. {{$text}}");
+        private double temperature = 0.8;
+
+        /// <summary>
+        /// Allows user to modify the default extractor prompt. The default prompt is as follows:
+        /// "Extract arguments and values from the following text only based on function specification 
+        /// provided, do not include extra parameter. {{$text}}"
+        /// </summary>
+        /// <param name="promptTemplate">Prompt template string with one input variable.</param>
+        /// <returns>Updated DataExtractorTool</returns>
+        public DataExtractorTool WithPrompt(string promptTemplate)
+        {
+            if(string.IsNullOrEmpty(promptTemplate))
+            {
+                extratorPrompt = new PromptTemplate(promptTemplate);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Allows user to override the temperature setting for data extraction. The default value is 0.8
+        /// </summary>
+        /// <param name="temperature">A value between 0 and 1 to control the randomness of the response.</param>
+        /// <returns></returns>
+        public DataExtractorTool WithTemperature(double temperature)
+        {
+            if (temperature > 0.0 && temperature <= 1.0)
+            {
+                this.temperature = temperature;
+            }
+            return this;
         }
 
         /// <summary>
@@ -107,23 +145,19 @@ namespace Automation.GenerativeAI.Tools
             //3. Combine the search results into a single text block
             //4. Use language model to extract the parameters
             var results = new Dictionary<string, string>();
-            if (text.Length > 3000)
+            if (text.Length > ChunkingThreshold)
             {
-                var searchtoool = SearchTool.ForSemanticSearchFromSource(text, 2000, 200).WithMaxResultCount(2);
+                var searchtoool = SearchTool.ForSemanticSearchFromSource(text, ChunkSize, ChunkOverlap).WithMaxResultCount(2);
                 foreach (var item in parameters) 
                 {
                     var r = await searchtoool.SearchAsync($"{item.Name}:{item.Description}");
 
-                    var msg = $@"Extract arguments and values from the following text only based on function specification provided, 
-                                  do not include extra parameter and if the data is not available in the text return empty text. 
-                                  PLEASE DO NOT MAKE UP DATA!!. 
-                                  {string.Join("\n", r.Select(x => x.content))}
-                                  Today's date: {DateTime.Today}";
+                    var txt = string.Join("\n", r.Select(x => x.content));
 
                     var func = new FunctionDescriptor(Name, "Extracts parameters", Enumerable.Repeat(item, 1));
 
-                    var chatmsg = new ChatMessage(Role.user, msg);
-                    var response = await languageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, 0.5);
+                    var chatmsg = FormatPrompt(extratorPrompt, txt);
+                    var response = await languageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, temperature);
                     if(response.Type == ResponseType.FunctionCall)
                     {
                         var arguments = GetArgumentValues(response);
@@ -137,16 +171,10 @@ namespace Automation.GenerativeAI.Tools
             }
             else
             {
-                var msg = $@"Extract arguments and values from the following text only based on function specification provided, 
-                                  do not include extra parameter and if the data is not available in the text return empty text. 
-                                  PLEASE DO NOT MAKE UP DATA!!. 
-                                  {text}
-                                  Today's date: {DateTime.Today}";
-
                 var func = new FunctionDescriptor(Name, "Extracts parameters", parameters);
 
-                var chatmsg = new ChatMessage(Role.user, msg);
-                var response = await LanguageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, 0.5);
+                var chatmsg = FormatPrompt(extratorPrompt, text);
+                var response = await LanguageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, temperature);
                 if (response.Type == ResponseType.FunctionCall)
                 {
                     var arguments = GetArgumentValues(response);
@@ -204,6 +232,13 @@ namespace Automation.GenerativeAI.Tools
             var function = new FunctionDescriptor(Name, Description, Enumerable.Repeat(input, 1));
 
             return function;
+        }
+
+        private ChatMessage FormatPrompt(PromptTemplate prompt, string input)
+        {
+            var ctx = new ExecutionContext();
+            ctx[prompt.Variables.First()] = input;
+            return prompt.FormatMessage(ctx);
         }
     }
 }

@@ -52,6 +52,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\GenerativeAI.Tools\GenerativeAI.Tools.csproj">
+      <Project>{67f97e97-6da9-4f9e-905a-4b252a683322}</Project>
+      <Name>GenerativeAI.Tools</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\GenerativeAI\GenerativeAI.csproj">
       <Project>{bc19718c-9636-4bbe-8965-90f70dfd17b2}</Project>
       <Name>GenerativeAI</Name>

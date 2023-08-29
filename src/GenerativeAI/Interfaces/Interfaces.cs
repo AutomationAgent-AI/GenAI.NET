@@ -19,7 +19,7 @@ namespace Automation.GenerativeAI.Interfaces
         /// </summary>
         /// <param name="messages">A list of messages as a history. The Response is generated for  
         /// the last message using the history of messages as context.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>An LLMResponse response object</returns>
         Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, double temperature);
@@ -32,7 +32,7 @@ namespace Automation.GenerativeAI.Interfaces
         /// the last message using the history of messages as context.</param>
         /// <param name="functions">A list of function descriptors to match if the request resolves 
         /// to function calling.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>An LLMResponse response object</returns>
         Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature);
@@ -251,7 +251,7 @@ namespace Automation.GenerativeAI.Interfaces
         /// <summary>
         /// Gets the response from AI on the current conversation asynchronously.
         /// </summary>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>A ChatMessage or FunctionCallMessage object.</returns>
         Task<ChatMessage> GetResponseAsync(double temperature);

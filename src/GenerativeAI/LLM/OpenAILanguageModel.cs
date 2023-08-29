@@ -99,7 +99,7 @@ namespace Automation.GenerativeAI.LLM
         /// </summary>
         /// <param name="messages">A list of messages as a history. The Response is generated for  
         /// the last message using the history of messages as context.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>An LLMResponse response object</returns>
         public async Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, double temperature)
@@ -115,7 +115,7 @@ namespace Automation.GenerativeAI.LLM
         /// the last message using the history of messages as context.</param>
         /// <param name="functions">A list of function descriptors to match if the request resolves 
         /// to function calling.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>An LLMResponse response object</returns>
         public LLMResponse GetResponse(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)
@@ -159,7 +159,7 @@ namespace Automation.GenerativeAI.LLM
         /// the last message using the history of messages as context.</param>
         /// <param name="functions">A list of function descriptors to match if the request resolves 
         /// to function calling.</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>An LLMResponse response object</returns>
         public async Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)

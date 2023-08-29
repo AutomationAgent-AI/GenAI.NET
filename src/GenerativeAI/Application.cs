@@ -127,7 +127,7 @@ namespace Automation.GenerativeAI
         /// Gets AI assitant's response for a given message. This request doesn't have any memory.
         /// </summary>
         /// <param name="message">User's message</param>
-        /// <param name="temperature">A value between 0 to 2, that controls randomness of the response. 
+        /// <param name="temperature">A value between 0 to 1, that controls randomness of the response. 
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>Response returned by the AI assitant.</returns>
         public static async Task<string> GetResponseAsync(string message, double temperature)
@@ -160,7 +160,7 @@ namespace Automation.GenerativeAI
         /// Sends message to language model to get AI assistant's response.
         /// </summary>
         /// <param name="message">User's message</param>
-        /// <param name="temperature"></param>
+        /// <param name="temperature">A value between 0 and 1 to control the randomness of the response.</param>
         /// <returns>Response message</returns>
         public static string GetResponse(string message, double temperature)
         {
@@ -240,7 +240,7 @@ namespace Automation.GenerativeAI
         /// <param name="systemctx">System message to specify, how to process a given message.</param>
         /// <param name="vdbpath">Full path of vector database to get the context.</param>
         /// <param name="message">User message for which response is required.</param>
-        /// <param name="temperature">A value between 0 and 2 to control the randomness of the response.</param>
+        /// <param name="temperature">A value between 0 and 1 to control the randomness of the response.</param>
         /// <returns>Returns the AI assitant's response.</returns>
         /// <exception cref="System.Exception"></exception>
         public static async Task<string> GetResponseFromContextAsync(string sessionid, string systemctx, string vdbpath, string message, double temperature) 
@@ -287,7 +287,7 @@ namespace Automation.GenerativeAI
         /// <param name="systemctx">System message to specify, how to process a given message.</param>
         /// <param name="vdbpath">Full path of vector database to get the context.</param>
         /// <param name="message">User message for which response is required.</param>
-        /// <param name="temperature">A value between 0 and 2 to control the randomness of the response.</param>
+        /// <param name="temperature">A value between 0 and 1 to control the randomness of the response.</param>
         /// <returns>Returns the AI assitant's response.</returns>
         /// <exception cref="System.Exception"></exception>
         public static string GetResponseFromContext(string sessionid, string systemctx, string vdbpath, string message, double temperature)
@@ -374,7 +374,7 @@ namespace Automation.GenerativeAI
         /// <param name="sessionid">The session id for the conversation.</param>
         /// <param name="functionName">Name of the function that was executed.</param>
         /// <param name="message">Output returned from the function call as string(json).</param>
-        /// <param name="temperature">A value between 0 and 2 to control the randomness of the response.</param>
+        /// <param name="temperature">A value between 0 and 1 to control the randomness of the response.</param>
         /// <returns>The response from the language model.</returns>
         public static string AddFunctionMessage(string sessionid, string functionName, string message, double temperature)
         {

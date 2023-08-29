@@ -59,8 +59,7 @@ public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, dou
 List of chat messages
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
- Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
+Not in use.
 
 #### Returns
 
@@ -87,8 +86,7 @@ A list of function descriptors to match if the request resolves
  to function calling.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
- Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
+Not in use.
 
 #### Returns
 
@@ -114,8 +112,7 @@ A list of function descriptors to match if the request resolves
  to function calling.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
- Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
+Not in use.
 
 #### Returns
 

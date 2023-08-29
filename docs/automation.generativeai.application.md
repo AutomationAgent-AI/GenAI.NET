@@ -121,7 +121,7 @@ public static Task<string> GetResponseAsync(string message, double temperature)
 User's message
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 2, that controls randomness of the response. 
+A value between 0 to 1, that controls randomness of the response. 
  Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
 
 #### Returns
@@ -143,6 +143,7 @@ public static string GetResponse(string message, double temperature)
 User's message
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+A value between 0 and 1 to control the randomness of the response.
 
 #### Returns
 
@@ -222,7 +223,7 @@ Full path of vector database to get the context.
 User message for which response is required.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 and 2 to control the randomness of the response.
+A value between 0 and 1 to control the randomness of the response.
 
 #### Returns
 
@@ -256,7 +257,7 @@ Full path of vector database to get the context.
 User message for which response is required.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 and 2 to control the randomness of the response.
+A value between 0 and 1 to control the randomness of the response.
 
 #### Returns
 
@@ -329,7 +330,7 @@ Name of the function that was executed.
 Output returned from the function call as string(json).
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 and 2 to control the randomness of the response.
+A value between 0 and 1 to control the randomness of the response.
 
 #### Returns
 
