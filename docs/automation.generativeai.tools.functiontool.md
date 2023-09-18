@@ -136,21 +136,26 @@ ExecutionContext
 [Task&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
 Output string
 
-### **Cast(String, TypeDescriptor)**
+### **Convert(String, TypeDescriptor)**
+
+Convert the given string data to a give type, either by parsing or deserializing from JSON.
 
 ```csharp
-public static object Cast(string data, TypeDescriptor type)
+public static object Convert(string data, TypeDescriptor type)
 ```
 
 #### Parameters
 
 `data` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Input data as string
 
 `type` [TypeDescriptor](./automation.generativeai.typedescriptor.md)<br>
+Type description for data conversion.
 
 #### Returns
 
 [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
+Object of the desired type.
 
 ### **ToJsonString(Object)**
 

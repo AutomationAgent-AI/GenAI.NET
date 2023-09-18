@@ -150,7 +150,7 @@ namespace Automation.GenerativeAI.Tools
                 var searchtoool = SearchTool.ForSemanticSearchFromSource(text, ChunkSize, ChunkOverlap).WithMaxResultCount(2);
                 foreach (var item in parameters) 
                 {
-                    var r = await searchtoool.SearchAsync($"{item.Name}:{item.Description}");
+                    var r = await searchtoool.SearchAsync($"{item.Name}:{item.Description}", string.Empty);
 
                     var txt = string.Join("\n", r.Select(x => x.content));
 

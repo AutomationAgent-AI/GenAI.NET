@@ -1,9 +1,11 @@
 ﻿using Automation.GenerativeAI;
+using Automation.GenerativeAI.Agents;
 using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -72,17 +74,14 @@ namespace GenAIFramework.Test
     }
 
     [TestClass]
-    public class ConversationTests
+    public class ConversationTests : TestBase
     {
-        private string RootPath = string.Empty;
-        private ILanguageModel languageModel;
-
-        public ConversationTests()
+        public ConversationTests() : base("ConversationTests")
         {
-            RootPath = Assembly.GetExecutingAssembly().Location;
-            var logfile = Path.Combine(RootPath, @"..\..\..\..\..\tests\output\ConversationTests.log");
-            Logger.SetLogFile(logfile);
+        }
 
+        protected override ILanguageModel CreateLanguageModel()
+        {
             var responses = new Dictionary<string, string>()
             {
                 { "Hi, there!! I am Ram", "Hello Ram! How can I assist you today?"},
@@ -100,9 +99,10 @@ namespace GenAIFramework.Test
                 { "Printed the forecast to", "Updated the financial forecast and printed at home" }
             };
 
-            languageModel = new MockLanguageModel("Mock", responses);
+            var languageModel = new MockLanguageModel("Mock", responses);
             //languageModel = new OpenAILanguageModel("gpt-3.5-turbo-0613");
             GenerativeApp.SetLanguageModel(languageModel);
+            return languageModel;
         }
 
         [TestMethod]
@@ -110,7 +110,7 @@ namespace GenAIFramework.Test
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "HelloWorldChat");
             
-            var chat = new Conversation("hello", languageModel);
+            var chat = new Conversation("hello", LanguageModel);
             Assert.IsNotNull(chat);
             Assert.AreEqual("hello", chat.Id);
 
@@ -125,7 +125,7 @@ namespace GenAIFramework.Test
         public async Task BasicFunctionTool()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "BasicFunctionTool");
-            var chat = new Conversation("tool", languageModel);
+            var chat = new Conversation("tool", LanguageModel);
             Assert.IsNotNull(chat);
             Assert.AreEqual("tool", chat.Id);
 
@@ -143,7 +143,7 @@ namespace GenAIFramework.Test
         public async Task BasicFunctionToolExecution()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "BasicFunctionToolExecution");
-            var chat = new Conversation("test", languageModel);
+            var chat = new Conversation("test", LanguageModel);
 
             var tool = new SimpleTool();
             chat.AddToolSet(tool);
@@ -158,7 +158,7 @@ namespace GenAIFramework.Test
         public async Task FailedFunctionToolExecution()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "FailedFunctionToolExecution");
-            var chat = new Conversation("test", languageModel);
+            var chat = new Conversation("test", LanguageModel);
 
             var tool = new SimpleTool();
             chat.AddToolSet(tool);
@@ -175,7 +175,7 @@ namespace GenAIFramework.Test
         public async Task DLLFunctionToolExecution()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "DLLFunctionToolExecution");
-            var chat = new Conversation("test", languageModel);
+            var chat = new Conversation("test", LanguageModel);
 
             var dllpath = FunctionsTests.GetDLLPath();
             var tool = new DLLFunctionTools(dllpath, "GenAIFramework.Test.Utilities");
@@ -192,10 +192,11 @@ namespace GenAIFramework.Test
         public async Task MultipleFunctionCall()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "MultipleFunctionCall");
-            var chat = new Conversation("test", languageModel);
+            var chat = new Conversation("test", LanguageModel);
 
             var dllpath = FunctionsTests.GetDLLPath();
             var tool = new DLLFunctionTools(dllpath, "GenAIFramework.Test.Utilities");
+            Utilities.Reset();
 
             chat.AddToolSet(tool);
 
@@ -214,10 +215,38 @@ namespace GenAIFramework.Test
         }
 
         [TestMethod]
+        public async Task AgentWithObjective()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Test, "AgentWithObjective");
+
+            var dllpath = FunctionsTests.GetDLLPath();
+            var tools = new DLLFunctionTools(dllpath, "GenAIFramework.Test.Utilities");
+            
+            Utilities.Reset();
+
+            var agent = Agent.Create("Test").WithLanguageModel(LanguageModel).WithTools(tools);
+
+            var objective = @"Please do three things, add an amount of 40 units to year 2023 headcount 
+                  and subtract an amount of 23 units from year 2022 opex forecast then 
+                  print out the forecast at home";
+
+            var action = await agent.ExecuteAsync(objective);
+            Assert.IsNotNull(action);
+            
+            var finish = action as FinishAction;
+            Assert.IsNotNull(finish);
+
+            var output = finish.Output.ToLower();
+            Assert.IsTrue(output.Contains("updated") || output.Contains("added"));
+            Assert.IsTrue(output.Contains("printed"));
+            Assert.IsTrue(output.Contains("home"));
+        }
+
+        [TestMethod]
         public async Task HandleFunctionCallMessage()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "HandleFunctionCallMessage");
-            var chat = new Conversation("test", languageModel);
+            var chat = new Conversation("test", LanguageModel);
 
             var tool = new SimpleTool();
             chat.AddToolSet(tool);
@@ -241,7 +270,7 @@ namespace GenAIFramework.Test
         public async Task ContextBasedQuestions()
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "ContextBasedQuestions");
-            var chat = new Conversation("context", languageModel);
+            var chat = new Conversation("context", LanguageModel);
 
             chat.AppendMessage("What is my name and which fruit do I like?", Role.user);
 

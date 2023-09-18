@@ -55,9 +55,11 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationTests.cs" />
     <Compile Include="ConversationTests.cs" />
     <Compile Include="GenerativeAIServiceTests.cs" />
     <Compile Include="OpenAITests.cs" />
+    <Compile Include="TestBase.cs" />
     <Compile Include="ToolsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FunctionsTests.cs" />

@@ -18,6 +18,16 @@
 
 [TypeDescriptor](./automation.generativeai.typedescriptor.md)
 
+## Automation.GenerativeAI.Agents
+
+[Agent](./automation.generativeai.agents.agent.md)
+
+[AgentAction](./automation.generativeai.agents.agentaction.md)
+
+[AgentType](./automation.generativeai.agents.agenttype.md)
+
+[FinishAction](./automation.generativeai.agents.finishaction.md)
+
 ## Automation.GenerativeAI.Chat
 
 [PromptTemplate](./automation.generativeai.chat.prompttemplate.md)
@@ -91,6 +101,8 @@
 [TextExtractorTool](./automation.generativeai.tools.textextractortool.md)
 
 [TextSplitter](./automation.generativeai.tools.textsplitter.md)
+
+[TextSummarizer](./automation.generativeai.tools.textsummarizer.md)
 
 [ToolsCollection](./automation.generativeai.tools.toolscollection.md)
 

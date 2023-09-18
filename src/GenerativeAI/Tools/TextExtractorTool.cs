@@ -44,8 +44,15 @@ namespace Automation.GenerativeAI.Tools
 
             var extensions = new[] { ".txt", ".csv", ".pdf" };
             var files = Application.GetFiles(source.ToString(), extensions);
-
+            
             List<ITextObject> textObjects = new List<ITextObject>();
+            
+            if (!files.Any()) //If there are no files then use it as raw text
+            {
+                textObjects.Add(TextObject.Create("RawText", source));
+                return textObjects;
+            }
+
             foreach (var file in files)
             {
                 var texts = txtservice.EnumerateText(file, "English");

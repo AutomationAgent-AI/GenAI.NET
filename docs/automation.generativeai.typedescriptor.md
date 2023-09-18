@@ -26,6 +26,8 @@ public string Type { get; }
 
 ### **StringType**
 
+StringType
+
 ```csharp
 public static TypeDescriptor StringType { get; }
 ```
@@ -35,6 +37,8 @@ public static TypeDescriptor StringType { get; }
 [TypeDescriptor](./automation.generativeai.typedescriptor.md)<br>
 
 ### **NumberType**
+
+NumberType
 
 ```csharp
 public static TypeDescriptor NumberType { get; }
@@ -46,6 +50,8 @@ public static TypeDescriptor NumberType { get; }
 
 ### **IntegerType**
 
+IntegerType
+
 ```csharp
 public static TypeDescriptor IntegerType { get; }
 ```
@@ -55,6 +61,8 @@ public static TypeDescriptor IntegerType { get; }
 [TypeDescriptor](./automation.generativeai.typedescriptor.md)<br>
 
 ### **BooleanType**
+
+BooleanType
 
 ```csharp
 public static TypeDescriptor BooleanType { get; }
@@ -83,6 +91,8 @@ Type name
 
 ### **ToDictionary()**
 
+Converts the type to a dictionary for JSON serialization
+
 ```csharp
 public Dictionary<string, object> ToDictionary()
 ```
@@ -92,6 +102,8 @@ public Dictionary<string, object> ToDictionary()
 [Dictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2)<br>
 
 ### **UpdateProperties(Dictionary&lt;String, Object&gt;)**
+
+Updates properties of type descriptor
 
 ```csharp
 protected void UpdateProperties(Dictionary<string, object> properties)

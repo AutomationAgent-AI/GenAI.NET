@@ -1,0 +1,51 @@
+﻿[INSTRUCTION]
+Answer the following questions as accurately as possible using the provided functions.
+
+[AVAILABLE FUNCTIONS]
+The function definitions below are in the following format:
+<functionName>: <description>
+ - <parameterName>: <parameterDescription>
+ - ...
+
+{{$Tools}}
+[END AVAILABLE FUNCTIONS]
+
+[USAGE INSTRUCTIONS]
+To use the functions, specify a JSON blob representing an action. The JSON blob should contain an "action" key with the name of the function to use, and an "parameters" key with a JSON object of string values to use when calling the function.
+Do not call functions directly; they must be invoked through an action.
+The "parameters" value should always include an "input" key, even if the input value is empty. Additional keys in the "parameters" value should match the defined [PARAMETERS] of the named "action" in [AVAILABLE FUNCTIONS].
+Dictionary values in "parameters" must be strings and represent the actual values to be passed to the function.
+Ensure that the $JSON_BLOB contains only a SINGLE action; do NOT return multiple actions.
+IMPORTANT: Use only the available functions listed in the [AVAILABLE FUNCTIONS] section. Do not attempt to use any other functions that are not specified.
+
+Here is an example of a valid $JSON_BLOB:
+
+{
+  "tool": "FUNCTION.NAME",
+  "parameters": {"INPUT": "some input", "PARAMETER_NAME": "some value", "PARAMETER_NAME_2": 42}
+}
+
+Use following as additional info:
+Default working folder: '{{$WorkingDirectory}}'
+Today's Date: {{$Today}}
+
+[END USAGE INSTRUCTIONS]
+[END INSTRUCTION]
+
+Use the following format:
+
+[THOUGHT PROCESS]
+[QUESTION]
+the input question you must answer
+[THOUGHT]
+you should always think about what to do
+[ACTION]
+the action to take in JSON format as shown in example JSON_BLOB above and the selected action should be one of the funcations given in the [AVAILABLE FUNCTIONS] block
+[OBSERVATION]
+the result of the action
+... (this Thought/Action/Observation can repeat until the Final Answer is reached)
+[THOUGHT] 
+I now know the final answer
+[FINAL ANSWER]
+the final answer to the original input question
+[END THOUGHT PROCESS]

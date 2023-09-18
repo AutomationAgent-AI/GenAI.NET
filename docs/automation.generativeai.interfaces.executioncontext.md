@@ -47,6 +47,16 @@ Parameters dictionary
 
 ## Methods
 
+### **GetParameters()**
+
+```csharp
+internal IDictionary<string, object> GetParameters()
+```
+
+#### Returns
+
+[IDictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.idictionary-2)<br>
+
 ### **TryGetResult(String, Object&)**
 
 Tries to get the result for specific tool

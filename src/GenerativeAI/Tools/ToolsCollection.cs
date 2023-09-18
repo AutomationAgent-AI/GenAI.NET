@@ -16,10 +16,14 @@ namespace Automation.GenerativeAI.Tools
 
         private string GetName(IFunctionTool tool)
         {
-            var name = tool.Name;
-            if (string.IsNullOrEmpty(tool.Name))
+            var name = tool.Descriptor.Name;
+            if (string.IsNullOrEmpty(name))
             {
-                name = tool.GetType().Name;
+                name = tool.Name;
+                if(string.IsNullOrEmpty(name))
+                {
+                    name = tool.GetType().Name;
+                }
             }
 
             return name;

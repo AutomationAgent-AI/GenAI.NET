@@ -1,5 +1,6 @@
 ﻿using Automation.GenerativeAI.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Automation.GenerativeAI.Tools
@@ -15,6 +16,8 @@ namespace Automation.GenerativeAI.Tools
             Type = new ArrayTypeDescriptor(TypeDescriptor.StringType),
             Required = true,
         };
+
+        private string skiptext = string.Empty;
 
         /// <summary>
         /// Constructor
@@ -34,6 +37,17 @@ namespace Automation.GenerativeAI.Tools
             return new CombineTool();
         }
 
+        /// <summary>
+        /// This tool will skip combining the text chunk if it is equal to the given skip text.
+        /// </summary>
+        /// <param name="skip">The text to skip from combine</param>
+        /// <returns>This CombineTool</returns>
+        public CombineTool WithSkipText(string skip)
+        {
+            skiptext = skip;
+            return this;
+        }
+
         protected override async Task<Result> ExecuteCoreAsync(ExecutionContext context)
         {
             object value;
@@ -41,7 +55,8 @@ namespace Automation.GenerativeAI.Tools
             {
                 IEnumerable<string> values = value as IEnumerable<string>;
                 var result = new Result() { success = true };
-                result.output = string.Join("\n\n", values);
+                var txt = values.Where(s => !s.Equals(skiptext, System.StringComparison.OrdinalIgnoreCase));
+                result.output = string.Join("\n\n", txt);
 
                 return await Task.FromResult(result);
             }

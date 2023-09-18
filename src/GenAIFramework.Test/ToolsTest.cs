@@ -5,47 +5,31 @@ using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Tools;
 using Automation.GenerativeAI.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace GenAIFramework.Test
 {
     [TestClass]
-    public class ToolsTest
+    public class ToolsTest : TestBase
     {
-        private string RootPath = string.Empty;
-        private ILanguageModel languageModel;
-
-        internal static string GetDLLPath()
+        protected override ILanguageModel CreateLanguageModel()
         {
-            var asm = Assembly.GetExecutingAssembly();
-            var codebase = asm.CodeBase;
-            UriBuilder uri = new UriBuilder(codebase);
-            string path = Uri.UnescapeDataString(uri.Path);
-
-            return path;
-        }
-
-        public ToolsTest()
-        {
-            RootPath = Assembly.GetExecutingAssembly().Location;
-            var logfile = Path.Combine(RootPath, @"..\..\..\..\..\tests\output\ToolsTest.log");
-            Logger.SetLogFile(logfile);
-
             var responses = new Dictionary<string, string>()
             {
                 { "What is the weather like in Boston?", "The weather in Boston is cold" },
                 { "What is the weather like in San Francisco?", "The weather in San Francisco is warm" },
-                { "Meta has reported sales growth after how many quarters of decline?", "Facebook parent Meta reported a return to sales growth after three quarters of\r\ndeclines." }
+                { "sales growth after", "Facebook parent Meta reported a return to sales growth after three quarters of\r\ndeclines." }
             };
 
-            languageModel = new MockLanguageModel("Mock", responses);
+            return new MockLanguageModel("Mock", responses);
+        }
+
+        public ToolsTest() : base("ToolsTest")
+        {
         }
 
         [TestMethod]
@@ -164,7 +148,7 @@ namespace GenAIFramework.Test
             Logger.WriteLog(LogLevel.Info, LogOps.Test, "TestQueryTool");
 
             var tool = QueryTool.WithPromptTemplate(@"What is the weather like in {{ $city }}?")
-                                .WithLanguageModel(languageModel);
+                                .WithLanguageModel(LanguageModel);
 
             Assert.IsNotNull(tool);
 
@@ -269,7 +253,7 @@ namespace GenAIFramework.Test
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
-            context[SearchTool.Parameter.Name] = "Microsoft and Generative AI";
+            context[SearchTool.QueryParameter.Name] = "Microsoft and Generative AI";
 
             var result = await tool.ExecuteAsync(context);
             Assert.IsTrue(!string.IsNullOrEmpty(result));
@@ -293,7 +277,7 @@ namespace GenAIFramework.Test
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
-            context[SearchTool.Parameter.Name] = "Meta has reported sales growth after how many quarters of decline?";
+            context[SearchTool.QueryParameter.Name] = "Meta has reported sales growth after how many quarters of decline?";
 
             var result = await tool.ExecuteAsync(context);
             Assert.IsTrue(!string.IsNullOrEmpty(result));
@@ -313,7 +297,7 @@ namespace GenAIFramework.Test
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
-            context[SearchTool.Parameter.Name] = "Meta has reported sales growth after how many quarters of decline?";
+            context[SearchTool.QueryParameter.Name] = "Meta has reported sales growth after how many quarters of decline?";
 
             var prompt = @"
                         Use following text as context to answer the follow up question.
@@ -325,7 +309,7 @@ namespace GenAIFramework.Test
                         {{$query}}
                         ";
 
-            var querytool = QueryTool.WithPromptTemplate(prompt).WithLanguageModel(languageModel);
+            var querytool = QueryTool.WithPromptTemplate(prompt).WithLanguageModel(LanguageModel);
 
             var pipeline = Pipeline.WithTools(new IFunctionTool[] { tool, querytool });
 
@@ -357,7 +341,7 @@ namespace GenAIFramework.Test
         [TestMethod]
         public async Task HttpPost()
         {
-            Logger.WriteLog(LogLevel.Info, LogOps.Test, "HttpGet");
+            Logger.WriteLog(LogLevel.Info, LogOps.Test, "HttpPost");
 
             using (var client = new HttpClient())
             {

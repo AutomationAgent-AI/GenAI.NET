@@ -11,6 +11,7 @@ namespace Automation.GenerativeAI.Tools
     public class QueryTool : PromptTool
     {
         ILanguageModel languageModel;
+        double temperature = 0.8;
 
         /// <summary>
         /// Default constructor of QueryTool
@@ -58,6 +59,17 @@ namespace Automation.GenerativeAI.Tools
             return this;
         }
 
+        /// <summary>
+        /// Sets the temperature parameter for the tool to define the creativity.
+        /// </summary>
+        /// <param name="temperature">A value between 0 and 1 to define creativity</param>
+        /// <returns>This QueryTool</returns>
+        public QueryTool WithTemperature(double temperature)
+        {
+            this.temperature = temperature;
+            return this;
+        }
+
         private ILanguageModel LanguageModel
         {
             get
@@ -83,7 +95,7 @@ namespace Automation.GenerativeAI.Tools
             var msg = prompt.FormatMessage(context);
             if (msg != null)
             {
-                var response = await LanguageModel.GetResponseAsync(Enumerable.Repeat(msg, 1), 0.8);
+                var response = await LanguageModel.GetResponseAsync(Enumerable.Repeat(msg, 1), temperature);
                 result.output = response.Response;
                 result.success = response.Type == ResponseType.Done;
             }

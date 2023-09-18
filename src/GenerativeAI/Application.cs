@@ -1,4 +1,5 @@
-﻿using Automation.GenerativeAI.Chat;
+﻿using Automation.GenerativeAI.Agents;
+using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Services;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using ExecutionContext = Automation.GenerativeAI.Interfaces.ExecutionContext;
 
@@ -41,7 +43,14 @@ namespace Automation.GenerativeAI
         private static ILanguageModel languageModel;
         private static ToolsCollection toolsCollection = new ToolsCollection();
         private static ExecutionContext exeResults = new ExecutionContext();
+        private static Dictionary<string, Agent> agents = new Dictionary<string, Agent>();
         
+        internal static void Reset()
+        {
+            toolsCollection = new ToolsCollection();
+            agents.Clear();
+        }
+
         private static ILanguageModel LanguageModel
         {
             get
@@ -312,7 +321,7 @@ namespace Automation.GenerativeAI
             int rowindex = 0;
             foreach(var line in lines)
             {
-                var props = line.Split(',');
+                var props = line.Split(',').Select(s => s.Trim()).ToArray();
                 if (rowindex == 0 && props.Any(x => string.Equals(x, "description", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     //Header row
@@ -332,8 +341,11 @@ namespace Automation.GenerativeAI
                     string type = props[indices["type"]];
                     switch (type)
                     {
+                        case "int":
                         case "integer":
                             descriptor.Type = TypeDescriptor.IntegerType; break;
+                        case "float":
+                        case "double":
                         case "number":
                             descriptor.Type = TypeDescriptor.NumberType; break;
                         case "boolean":
@@ -369,7 +381,7 @@ namespace Automation.GenerativeAI
         }
 
         /// <summary>
-        /// Adds a function message as a response to function_call message.
+        /// Adds a function message as a response to function_call message to a given conversation.
         /// </summary>
         /// <param name="sessionid">The session id for the conversation.</param>
         /// <param name="functionName">Name of the function that was executed.</param>
@@ -725,6 +737,126 @@ namespace Automation.GenerativeAI
             }
 
             return $"ERROR: Invalid parametersJson, unable to parse the json as dictionary!!";
+        }
+
+        /// <summary>
+        /// Creates a text summarizer tool with map reduce strategy.
+        /// </summary>
+        /// <param name="name">Name of the tool</param>
+        /// <param name="description">Description of the tool</param>
+        /// <param name="mapperPrompt">Prompt to summarize each chunk from a large text.</param>
+        /// <param name="reducerPrompt">Prompt to combine all the summaries to create final summary.</param>
+        /// <returns>Status of the operation</returns>
+        public static string CreateSummarizerTool(string name, string description, string mapperPrompt, string reducerPrompt)
+        {
+            var tool = toolsCollection.GetTool(name);
+            if (tool != null) return $"ERROR: A tool with name, '{name}' already exists!!";
+
+            tool = TextSummarizer.WithMapReduce(mapperPrompt, reducerPrompt)
+                .WithLanguageModel(LanguageModel)
+                .WithName(name)
+                .WithDescription(description);
+
+            toolsCollection.AddTool(tool);
+            return "success";
+        }
+
+        /// <summary>
+        /// Creates an automation agent which can perform a given objective with the help of tools available with it.
+        /// </summary>
+        /// <param name="name">Name of the agent</param>
+        /// <param name="allowedTools">Lists of tools that agent can use to perform an objective.</param>
+        /// <param name="maxAllowedSteps">Maximum number of steps the agent is allowed to execute.</param>
+        /// <param name="workingdirectory">Working directory for agent to store temporary data.</param>
+        /// <returns>Status of the operation</returns>
+        public static string CreateAgent(string name, List<string> allowedTools, int maxAllowedSteps, string workingdirectory)
+        {
+            var tools = allowedTools.Select(x => toolsCollection.GetTool(x)).Where(t => t != null).ToList();
+
+            var agent = Agent.Create(name, workingdirectory)
+                .WithLanguageModel(LanguageModel)
+                .WithTools(tools)
+                .WithMaxAllowedSteps(maxAllowedSteps);
+
+            agents.Add(name, agent);
+
+            return "success";
+        }
+
+        /// <summary>
+        /// Executes a given objective.
+        /// </summary>
+        /// <param name="agent">Name of the agent</param>
+        /// <param name="objective">Objective to achieve</param>
+        /// <param name="temperature">A value between 0 and 1 to define creativity.</param>
+        /// <returns>Agent's response for the given objective as a JSON object of the following format. 
+        /// { "tool": "Tool's Name", "parameters": {"INPUT": "some input", "PARAMETER_NAME": "some value"}}
+        /// If excution is complete then the tool will be "FinishAction" else
+        /// the agent will return an action that client can execute and update agent with response
+        /// using UpdateAgentActionResponse method.</returns>
+        public static string PlanAndExecuteWithAgent(string agent, string objective, double temperature)
+        {
+            Agent worker = null;
+
+            if (!agents.TryGetValue(agent, out worker))
+            {
+                var error = new StepAction() { 
+                    tool = "FinishAction", 
+                    parameters = new Dictionary<string, object>() { 
+                        { "error", $"ERROR: Agent: '{agent}' not found!!" } 
+                    } 
+                };
+                return FunctionTool.ToJsonString(error);
+            }
+
+            worker.WithTemperature(temperature); //update the temperature parameter
+            var step = worker.ExecuteAsync(objective).GetAwaiter().GetResult();
+
+            var result = new StepAction()
+            {
+                tool = step.Tool.Name,
+                parameters = new Dictionary<string, object>(step.ExecutionContext.GetParameters())
+            };
+
+            return FunctionTool.ToJsonString(result);
+        }
+
+        /// <summary>
+        /// Updates the agent action response with the agent and executes the rest of the plan.
+        /// </summary>
+        /// <param name="agent">Name of the agent</param>
+        /// <param name="toolName">Name of the tool that has executed</param>
+        /// <param name="output">output of the tool</param>
+        /// <returns>Agent's response for the given objective as a JSON object of the following format. 
+        /// { "tool": "Tool's Name", "parameters": {"INPUT": "some input", "PARAMETER_NAME": "some value"}}
+        /// If excution is complete then the tool will be "FinishAction" else
+        /// the agent will return an action that client can execute and update agent with response
+        /// using UpdateAgentActionResponse method.</returns>
+        public static string UpdateAgentActionResponse(string agent, string toolName, string output)
+        {
+            Agent worker = null;
+
+            if (!agents.TryGetValue(agent, out worker))
+            {
+                var error = new StepAction()
+                {
+                    tool = "FinishAction",
+                    parameters = new Dictionary<string, object>() {
+                        { "error", $"ERROR: Agent: '{agent}' not found!!" }
+                    }
+                };
+                return FunctionTool.ToJsonString(error);
+            }
+
+            var step = worker.UpdateAgentActionResponseAsync(toolName, output).GetAwaiter().GetResult();
+
+            var result = new StepAction()
+            {
+                tool = step.Tool.Name,
+                parameters = new Dictionary<string, object>(step.ExecutionContext.GetParameters())
+            };
+
+            return FunctionTool.ToJsonString(result);
         }
 
         #endregion

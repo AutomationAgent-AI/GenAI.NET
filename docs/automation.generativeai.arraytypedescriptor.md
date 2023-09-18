@@ -2,6 +2,8 @@
 
 Namespace: Automation.GenerativeAI
 
+Represents an Array type
+
 ```csharp
 public class ArrayTypeDescriptor : TypeDescriptor
 ```
@@ -51,6 +53,8 @@ public ArrayTypeDescriptor(TypeDescriptor itemType)
 ## Methods
 
 ### **UpdateProperties(Dictionary&lt;String, Object&gt;)**
+
+Updates the properties of Array type
 
 ```csharp
 protected void UpdateProperties(Dictionary<string, object> properties)

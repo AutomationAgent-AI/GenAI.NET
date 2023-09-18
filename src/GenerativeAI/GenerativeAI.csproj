@@ -59,6 +59,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agents\Agent.cs" />
+    <Compile Include="Agents\AgentAction.cs" />
+    <Compile Include="Agents\GenerativeAIAgent.cs" />
+    <Compile Include="Agents\ChainOfThoughtResponsePraser.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Chat\Conversation.cs" />
     <Compile Include="Chat\PromptTemplate.cs" />
@@ -81,7 +85,9 @@
     <Compile Include="Tools\SemanticSearch.cs" />
     <Compile Include="Tools\TextExtractorTool.cs" />
     <Compile Include="Tools\TextSplitter.cs" />
+    <Compile Include="Tools\TextSummarizer.cs" />
     <Compile Include="Tools\ToolsCollection.cs" />
+    <Compile Include="Utilities\EmbeddedResource.cs" />
     <Compile Include="Utilities\ExtensionMethods.cs" />
     <Compile Include="Tools\FunctionDescriptor.cs" />
     <Compile Include="Services\GenerativeAIService.cs" />
@@ -102,6 +108,27 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\MRKLPrompt.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\ChainOfThoughtPrompt.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\FunctionAgentPrompt.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prompts\SummaryOfSummaryPrompt.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prompts\TextSummaryPrompt.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

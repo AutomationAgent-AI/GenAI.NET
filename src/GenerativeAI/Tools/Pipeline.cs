@@ -45,7 +45,7 @@ namespace Automation.GenerativeAI.Tools
             if(tools.Count > 0)
             {
                 //If the follow up tool has more than one parameter then it can't be added
-                if (tool.Descriptor.Parameters.Properties.Count(p => !p.Name.StartsWith("Result.")) > 1)
+                if (tool.Descriptor.Parameters.Properties.Count(p => !p.Name.StartsWith("Result.") && p.Required) > 1)
                 {
                     Logger.WriteLog(LogLevel.Warning, LogOps.Result, $"Tool: {tool.Name} has more than one input parameter, hence can't be added to the pipeline");
                     return false;
@@ -73,11 +73,12 @@ namespace Automation.GenerativeAI.Tools
             var currentctx = context;
             foreach (IFunctionTool tool in tools)
             {
-                if (!string.IsNullOrEmpty(result) && tool.Descriptor.Parameters.Properties.Count == 1)
+                var requiredParameters = tool.Descriptor.Parameters.Properties.Where(p => p.Required && !p.Name.StartsWith("Result.")).ToList();
+                if (!string.IsNullOrEmpty(result) && requiredParameters.Count == 1)
                 {
                     var descriptor = tool.Descriptor;
                     currentctx = new ExecutionContext();
-                    currentctx[descriptor.Parameters.Properties[0].Name] = result;
+                    currentctx[requiredParameters[0].Name] = result;
                 }
 
                 result = await tool.ExecuteAsync(currentctx);

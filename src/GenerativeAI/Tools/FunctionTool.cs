@@ -115,9 +115,14 @@ namespace Automation.GenerativeAI.Tools
             {
                 if(ValidateParameterTypes(context, Descriptor.Parameters.Properties))
                 {
+                    Logger.WriteLog(LogLevel.Info, LogOps.Command, $"Started Executing tool: {Name}.");
                     var result = await ExecuteCoreAsync(context);
                     retval = result.output;
                     success = result.success;
+                }
+                else
+                {
+                    Logger.WriteLog(LogLevel.Error, LogOps.Result, $"Parameter validation for tool: {Name} has failed!");
                 }
             }
             catch (System.Exception ex)
@@ -132,6 +137,7 @@ namespace Automation.GenerativeAI.Tools
                 {
                     context.AddResult(Name, retval);
                     output = ToJsonString(retval);
+                    Logger.WriteLog(LogLevel.Info, LogOps.Result, output);
                 }
                 else
                 {
@@ -151,14 +157,14 @@ namespace Automation.GenerativeAI.Tools
             foreach(ParameterDescriptor parameter in parameters)
             {
                 object data = null;
-
-                if (parameter.Required && !context.TryGetValue(parameter.Name, out data))
+                bool found = context.TryGetValue(parameter.Name, out data);
+                if (!parameter.Required && !found)
                 {
                     context[parameter.Name] = null;
-                    return true;
+                    continue;
                 }
 
-                if(parameter.Type.Type == TypeDescriptor.StringType.Type)
+                if(found && parameter.Type.Type == TypeDescriptor.StringType.Type)
                 {
                     context[parameter.Name] = ToJsonString(data);
                 }
@@ -187,7 +193,7 @@ namespace Automation.GenerativeAI.Tools
                 }
                 else if(data != null && data is string)
                 {
-                    var value = Cast((string)data, parameter.Type);
+                    var value = Convert((string)data, parameter.Type);
                     if(value == null) return false;
 
                     context[parameter.Name] = value;
@@ -197,7 +203,13 @@ namespace Automation.GenerativeAI.Tools
             return true;
         }
 
-        public static object Cast(string data, TypeDescriptor type)
+        /// <summary>
+        /// Convert the given string data to a give type, either by parsing or deserializing from JSON.
+        /// </summary>
+        /// <param name="data">Input data as string</param>
+        /// <param name="type">Type description for data conversion.</param>
+        /// <returns>Object of the desired type.</returns>
+        public static object Convert(string data, TypeDescriptor type)
         {
             switch (type.Type)
             {
