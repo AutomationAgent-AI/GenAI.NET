@@ -339,7 +339,7 @@ namespace GenAIFramework.Test
 
             var agent = "ForecastAgent";
             
-            var status = Application.CreateAgent(agent, tools, string.Empty);
+            var status = Application.CreateAgent(agent, tools, 3, string.Empty);
             Assert.AreEqual("success", status);
 
             var objective = @"Please do three things, add an amount of 40 units to year 2023 headcount 
@@ -378,7 +378,7 @@ namespace GenAIFramework.Test
             var tools = new List<string>() { "EditFinancialForecast", "PrintFinancialForecast" };
             var agent = "ForecastAgent";
 
-            var status = Application.CreateAgent(agent, tools, string.Empty);
+            var status = Application.CreateAgent(agent, tools, 3, string.Empty);
             Assert.AreEqual("success", status);
 
             var objective = @"Please do three things, add an amount of 40 units to year 2023 headcount 

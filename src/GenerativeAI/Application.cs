@@ -765,16 +765,18 @@ namespace Automation.GenerativeAI
         /// Creates an automation agent which can perform a given objective with the help of tools available with it.
         /// </summary>
         /// <param name="name">Name of the agent</param>
-        /// <param name="workingdirectory">Working directory for agent to store temporary data.</param>
         /// <param name="allowedTools">Lists of tools that agent can use to perform an objective.</param>
+        /// <param name="maxAllowedSteps">Maximum number of steps the agent is allowed to execute.</param>
+        /// <param name="workingdirectory">Working directory for agent to store temporary data.</param>
         /// <returns>Status of the operation</returns>
-        public static string CreateAgent(string name, List<string> allowedTools, string workingdirectory)
+        public static string CreateAgent(string name, List<string> allowedTools, int maxAllowedSteps, string workingdirectory)
         {
             var tools = allowedTools.Select(x => toolsCollection.GetTool(x)).Where(t => t != null).ToList();
 
             var agent = Agent.Create(name, workingdirectory)
                 .WithLanguageModel(LanguageModel)
-                .WithTools(tools);
+                .WithTools(tools)
+                .WithMaxAllowedSteps(maxAllowedSteps);
 
             agents.Add(name, agent);
 

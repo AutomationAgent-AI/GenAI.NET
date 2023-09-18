@@ -31,6 +31,8 @@ namespace Automation.GenerativeAI.Agents
         protected string SystemPrompt;
         protected double Temperature = 0.8;
         private ILanguageModel languageModel;
+        private int MaxAllowedSteps = 10;
+        private List<AgentAction> Steps = new List<AgentAction>();
 
         /// <summary>
         /// Name of the Agent
@@ -87,6 +89,17 @@ namespace Automation.GenerativeAI.Agents
         }
 
         /// <summary>
+        /// Sets the maximum number of steps this agent can execute.
+        /// </summary>
+        /// <param name="maxAllowedSteps">Maximum number of steps that can be executed.</param>
+        /// <returns>This Agent</returns>
+        public Agent WithMaxAllowedSteps(int maxAllowedSteps = 10)
+        {
+            MaxAllowedSteps = maxAllowedSteps;
+            return this;
+        }
+
+        /// <summary>
         /// Provide the language model for agent to work on. If a model is not set 
         /// it will use a default language model
         /// </summary>
@@ -120,6 +133,7 @@ namespace Automation.GenerativeAI.Agents
         public async Task<AgentAction> ExecuteAsync(string objective)
         {
             Messages.Clear(); //Clear the old message before starting on new objective.
+            Steps.Clear(); //Clear old steps as we are starting a new objective.
 
             Messages.Add(new ChatMessage(Role.system, SystemPrompt));
             Messages.Add(new ChatMessage(Role.user, objective));
@@ -135,6 +149,17 @@ namespace Automation.GenerativeAI.Agents
             while (done == null)
             {
                 action = await GetNextActionAsync(Messages);
+                Steps.Add(action);
+
+                done = action as FinishAction;
+                if (done != null) return action;
+
+                if (Steps.Count > MaxAllowedSteps)
+                {
+                    var step = new StepAction() { tool = action.Tool.Name, parameters = new Dictionary<string, object>(action.ExecutionContext.GetParameters()) };
+                    return new FinishAction(FunctionTool.ToJsonString(step), $"ERROR: Exceeded the maximum allowed steps, MaxAllowedSteps ={MaxAllowedSteps}");
+                }
+
                 if (action != null)
                 {
                     var result = await action.ExecuteAsync();
@@ -143,7 +168,6 @@ namespace Automation.GenerativeAI.Agents
                     if (string.IsNullOrEmpty(result)) return action;
                     Messages.Add(new FunctionMessage(action.Tool.Name, result));
                 }
-                done = action as FinishAction;
             }
 
             return action;
