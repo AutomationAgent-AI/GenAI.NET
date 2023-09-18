@@ -105,6 +105,24 @@ The language model implementation
 [QueryTool](./automation.generativeai.tools.querytool.md)<br>
 QueryTool
 
+### **WithTemperature(Double)**
+
+Sets the temperature parameter for the tool to define the creativity.
+
+```csharp
+public QueryTool WithTemperature(double temperature)
+```
+
+#### Parameters
+
+`temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+A value between 0 and 1 to define creativity
+
+#### Returns
+
+[QueryTool](./automation.generativeai.tools.querytool.md)<br>
+This QueryTool
+
 ### **ExecuteCoreAsync(ExecutionContext)**
 
 Overrides the core executoion logic to execute this query tool with the given context

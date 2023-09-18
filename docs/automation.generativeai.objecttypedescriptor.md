@@ -54,6 +54,8 @@ public ObjectTypeDescriptor(IEnumerable<ParameterDescriptor> properties)
 
 ### **UpdateProperties(Dictionary&lt;String, Object&gt;)**
 
+Updates the properties of the object type
+
 ```csharp
 protected void UpdateProperties(Dictionary<string, object> properties)
 ```

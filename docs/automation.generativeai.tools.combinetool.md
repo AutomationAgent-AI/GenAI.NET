@@ -64,6 +64,24 @@ public static CombineTool Create()
 [CombineTool](./automation.generativeai.tools.combinetool.md)<br>
 CombineTool
 
+### **WithSkipText(String)**
+
+This tool will skip combining the text chunk if it is equal to the given skip text.
+
+```csharp
+public CombineTool WithSkipText(string skip)
+```
+
+#### Parameters
+
+`skip` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The text to skip from combine
+
+#### Returns
+
+[CombineTool](./automation.generativeai.tools.combinetool.md)<br>
+This CombineTool
+
 ### **ExecuteCoreAsync(ExecutionContext)**
 
 ```csharp

@@ -36,6 +36,12 @@ public Application()
 
 ## Methods
 
+### **Reset()**
+
+```csharp
+internal static void Reset()
+```
+
 ### **SetLanguageModel(ILanguageModel)**
 
 ```csharp
@@ -312,7 +318,7 @@ List of the tools name that got added to the tools collection.
 
 ### **AddFunctionMessage(String, String, String, Double)**
 
-Adds a function message as a response to function_call message.
+Adds a function message as a response to function_call message to a given conversation.
 
 ```csharp
 public static string AddFunctionMessage(string sessionid, string functionName, string message, double temperature)
@@ -688,3 +694,113 @@ The key value pairs for name and description for parameters to be extracted
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 Status of the operation
+
+### **CreateSummarizerTool(String, String, String, String)**
+
+Creates a text summarizer tool with map reduce strategy.
+
+```csharp
+public static string CreateSummarizerTool(string name, string description, string mapperPrompt, string reducerPrompt)
+```
+
+#### Parameters
+
+`name` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the tool
+
+`description` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Description of the tool
+
+`mapperPrompt` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Prompt to summarize each chunk from a large text.
+
+`reducerPrompt` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Prompt to combine all the summaries to create final summary.
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Status of the operation
+
+### **CreateAgent(String, List&lt;String&gt;, Int32, String)**
+
+Creates an automation agent which can perform a given objective with the help of tools available with it.
+
+```csharp
+public static string CreateAgent(string name, List<string> allowedTools, int maxAllowedSteps, string workingdirectory)
+```
+
+#### Parameters
+
+`name` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the agent
+
+`allowedTools` [List&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1)<br>
+Lists of tools that agent can use to perform an objective.
+
+`maxAllowedSteps` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+Maximum number of steps the agent is allowed to execute.
+
+`workingdirectory` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Working directory for agent to store temporary data.
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Status of the operation
+
+### **PlanAndExecuteWithAgent(String, String, Double)**
+
+Executes a given objective.
+
+```csharp
+public static string PlanAndExecuteWithAgent(string agent, string objective, double temperature)
+```
+
+#### Parameters
+
+`agent` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the agent
+
+`objective` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Objective to achieve
+
+`temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+A value between 0 and 1 to define creativity.
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Agent's response for the given objective as a JSON object of the following format. 
+ { "tool": "Tool's Name", "parameters": {"INPUT": "some input", "PARAMETER_NAME": "some value"}}
+ If excution is complete then the tool will be "FinishAction" else
+ the agent will return an action that client can execute and update agent with response
+ using UpdateAgentActionResponse method.
+
+### **UpdateAgentActionResponse(String, String, String)**
+
+Updates the agent action response with the agent and executes the rest of the plan.
+
+```csharp
+public static string UpdateAgentActionResponse(string agent, string toolName, string output)
+```
+
+#### Parameters
+
+`agent` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the agent
+
+`toolName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the tool that has executed
+
+`output` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+output of the tool
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Agent's response for the given objective as a JSON object of the following format. 
+ { "tool": "Tool's Name", "parameters": {"INPUT": "some input", "PARAMETER_NAME": "some value"}}
+ If excution is complete then the tool will be "FinishAction" else
+ the agent will return an action that client can execute and update agent with response
+ using UpdateAgentActionResponse method.

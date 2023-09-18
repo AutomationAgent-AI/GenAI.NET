@@ -13,12 +13,20 @@ Implements [IFunctionTool](./automation.generativeai.interfaces.ifunctiontool.md
 
 ## Fields
 
-### **Parameter**
+### **QueryParameter**
 
-The default parameter description for the search tool.
+The query parameter description for the search tool.
 
 ```csharp
-public static ParameterDescriptor Parameter;
+public static ParameterDescriptor QueryParameter;
+```
+
+### **ContextParameter**
+
+The context parameter for the search tool.
+
+```csharp
+public static ParameterDescriptor ContextParameter;
 ```
 
 ## Properties
@@ -61,21 +69,26 @@ public FunctionDescriptor Descriptor { get; }
 
 ## Methods
 
-### **SearchAsync(String)**
+### **SearchAsync(String, String)**
 
 Performs search
 
 ```csharp
-public abstract Task<IEnumerable<SearchResult>> SearchAsync(string query)
+public abstract Task<IEnumerable<SearchResult>> SearchAsync(string query, string context)
 ```
 
 #### Parameters
 
 `query` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+What to search
+
+`context` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Optional parameter, Context from where to search
 
 #### Returns
 
 [Task&lt;IEnumerable&lt;SearchResult&gt;&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
+Search results
 
 ### **ForBingSearch(String)**
 

@@ -89,6 +89,8 @@ Updated HttpTool
 
 ### **ExecuteCoreAsync(ExecutionContext)**
 
+Implements the execution logic
+
 ```csharp
 protected Task<Result> ExecuteCoreAsync(ExecutionContext context)
 ```
@@ -102,6 +104,8 @@ protected Task<Result> ExecuteCoreAsync(ExecutionContext context)
 [Task&lt;Result&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
 
 ### **GetDescriptor()**
+
+Provides the descriptor of the tool
 
 ```csharp
 protected FunctionDescriptor GetDescriptor()
@@ -203,6 +207,8 @@ The response body as a string.
 
 ### **Dispose(Boolean)**
 
+Disposes/releases the unmanaged resources.
+
 ```csharp
 protected void Dispose(bool disposing)
 ```
@@ -212,6 +218,8 @@ protected void Dispose(bool disposing)
 `disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 
 ### **Dispose()**
+
+Disposes the unmanaged resources and suppresses GC finalization
 
 ```csharp
 public void Dispose()

@@ -2,6 +2,8 @@
 
 Namespace: Automation.GenerativeAI
 
+Represents Enum type
+
 ```csharp
 public class EnumTypeDescriptor : TypeDescriptor
 ```
@@ -38,6 +40,8 @@ public string Type { get; }
 
 ### **EnumTypeDescriptor(String[])**
 
+Constructor
+
 ```csharp
 public EnumTypeDescriptor(String[] options)
 ```
@@ -49,6 +53,8 @@ public EnumTypeDescriptor(String[] options)
 ## Methods
 
 ### **UpdateProperties(Dictionary&lt;String, Object&gt;)**
+
+Update properties of Enum type
 
 ```csharp
 protected void UpdateProperties(Dictionary<string, object> properties)
