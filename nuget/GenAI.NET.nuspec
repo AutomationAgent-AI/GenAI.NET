@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>GenAI.NET</id>
-        <version>1.1.8640.40728</version>
+        <version>1.1.8661.30687</version>
         <authors>Automation Agent</authors>
         <owners>Automation Agent</owners>
         <projectUrl>https://github.com/automaze1/GenAI.NET</projectUrl>
