@@ -44,7 +44,7 @@ namespace Automation.GenerativeAI.Tools
         /// </summary>
         /// <param name="query">Search query</param>
         /// <returns>List of search results</returns>
-        public async override Task<IEnumerable<SearchResult>> SearchAsync(string query)
+        public async override Task<IEnumerable<SearchResult>> SearchAsync(string query, string context)
         {
             string uri = $"https://api.bing.microsoft.com/v7.0/search?q={Uri.EscapeDataString(query)}&count={count+1}&offset=0";
 

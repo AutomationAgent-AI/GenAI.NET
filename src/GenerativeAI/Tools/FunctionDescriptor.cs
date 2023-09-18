@@ -22,11 +22,30 @@ namespace Automation.GenerativeAI
         /// </summary>
         public string Type { get; }
 
+        /// <summary>
+        /// StringType
+        /// </summary>
         public static TypeDescriptor StringType => new TypeDescriptor("string");
+
+        /// <summary>
+        /// NumberType
+        /// </summary>
         public static TypeDescriptor NumberType => new TypeDescriptor("number");
+
+        /// <summary>
+        /// IntegerType
+        /// </summary>
         public static TypeDescriptor IntegerType => new TypeDescriptor("integer");
+
+        /// <summary>
+        /// BooleanType
+        /// </summary>
         public static TypeDescriptor BooleanType => new TypeDescriptor("boolean");
 
+        /// <summary>
+        /// Converts the type to a dictionary for JSON serialization
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, object> ToDictionary()
         {
             var properties = new Dictionary<string, object>();
@@ -36,14 +55,25 @@ namespace Automation.GenerativeAI
             return properties;
         }
 
+        /// <summary>
+        /// Updates properties of type descriptor
+        /// </summary>
+        /// <param name="properties"></param>
         protected virtual void UpdateProperties(Dictionary<string, object> properties) 
         {
             properties.Add("type", Type);
         }
     }
 
+    /// <summary>
+    /// Represents Enum type
+    /// </summary>
     public class EnumTypeDescriptor : TypeDescriptor
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="options"></param>
         public EnumTypeDescriptor(string[] options) : base("string")
         {
             this.Options = options;
@@ -54,6 +84,10 @@ namespace Automation.GenerativeAI
         /// </summary>
         public string[] Options { get; set; }
 
+        /// <summary>
+        /// Update properties of Enum type
+        /// </summary>
+        /// <param name="properties"></param>
         protected override void UpdateProperties(Dictionary<string, object> properties)
         {
             base.UpdateProperties(properties);
@@ -61,6 +95,9 @@ namespace Automation.GenerativeAI
         }
     }
 
+    /// <summary>
+    /// Represents an Array type
+    /// </summary>
     public class ArrayTypeDescriptor : TypeDescriptor
     {
         /// <summary>
@@ -77,6 +114,10 @@ namespace Automation.GenerativeAI
         /// </summary>
         public TypeDescriptor ItemType { get; set; }
 
+        /// <summary>
+        /// Updates the properties of Array type
+        /// </summary>
+        /// <param name="properties"></param>
         protected override void UpdateProperties(Dictionary<string, object> properties)
         {
             base.UpdateProperties(properties);
@@ -104,6 +145,10 @@ namespace Automation.GenerativeAI
         /// </summary>
         public List<ParameterDescriptor> Properties { get; set; }
 
+        /// <summary>
+        /// Updates the properties of the object type
+        /// </summary>
+        /// <param name="properties"></param>
         protected override void UpdateProperties(Dictionary<string, object> properties)
         {
             base.UpdateProperties(properties);

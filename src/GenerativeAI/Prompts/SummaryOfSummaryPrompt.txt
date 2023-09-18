@@ -1,0 +1,9 @@
+﻿Following texts are summary of a part of a article. Write a coherent summary of all these texts to get a full story of the article. 
+Please also identify a suitable title of the story.
+
+TEXTS:
+
+{{$text}}
+
+TITLE:
+FULL SUMMARY:

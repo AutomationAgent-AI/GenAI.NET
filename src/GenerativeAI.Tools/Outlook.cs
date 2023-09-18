@@ -131,10 +131,13 @@ namespace Automation.GenerativeAI.Tools
         /// <param name="fromDate">Emails not older than fromDate to be read. Date needs to be in dd/MM/yyyy format.</param>
         /// <param name="toDate">Emails not newer than toDate to be read. Date needs to be in dd/MM/yyyy format.</param>
         /// <param name="count">Maximum number of eamils to be returned.</param>
+        /// <param name="downloadFolder">Full path of a folder where attachments to be downloaded. If it is empty
+        /// attachments will not be downloaded.</param>
         /// <returns>List of email messages</returns>
-        public static IEnumerable<EmailMessage> GetEmails(string sender, string subjectFilter, string fromDate, string toDate, int count)
+        public static IEnumerable<EmailMessage> GetEmails(string sender, string subjectFilter, string fromDate, string toDate, int count, string downloadFolder)
         {
             List<EmailMessage> emails = new List<EmailMessage>();
+            bool downloadAttachments = !string.IsNullOrWhiteSpace(downloadFolder) && Directory.Exists(downloadFolder);
             try
             {
                 var outlookApp = GetApplicationObject();
@@ -216,6 +219,10 @@ namespace Automation.GenerativeAI.Tools
                         foreach (Attachment attachment in mail.Attachments)
                         {
                             email.Attachments.Add(attachment.FileName);
+                            if (downloadAttachments)
+                            {
+                                attachment.SaveAsFile(Path.Combine(downloadFolder, attachment.FileName));
+                            }
                         }
                     }
                     emails.Add(email);

@@ -15,10 +15,16 @@ namespace GenAIFramework.Test
         OfficePrinter
     }
 
-    internal class Utilities
+    public class Utilities
     {
         private static int headcount = 200;
         private static int opex = 500;
+
+        internal static void Reset()
+        {
+            headcount = 200;
+            opex = 500;
+        }
 
         /// <summary>
         /// Adds two numbers
@@ -91,7 +97,7 @@ namespace GenAIFramework.Test
         /// </summary>
         /// <param name="year">The year for which data to edit</param>
         /// <param name="category">The category of data to edit</param>
-        /// <param name="amount">Amoun of units to edit</param>
+        /// <param name="amount">Amount of units to edit</param>
         /// <returns></returns>
         public static Dictionary<string, int> EditFinancialForecast(int year, string category, int amount)
         {

@@ -5,6 +5,7 @@ using PdfSharp.Drawing.BarCodes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -70,7 +71,13 @@ namespace Automation.GenerativeAI
 
                 if (value is string && p.ParameterType.IsEnum)
                 {
+                    if (string.IsNullOrEmpty((string)value)) return p.DefaultValue;
+
                     return System.Enum.Parse(p.ParameterType, (string)value);
+                }
+                else if(p.ParameterType.IsValueType && value.GetType() != p.ParameterType)
+                {
+                    return System.Convert.ChangeType(value, p.ParameterType);
                 }
 
                 return value;
@@ -176,7 +183,7 @@ namespace Automation.GenerativeAI
                 int id = 1;
                 foreach (var m in methods)
                 {
-                    var functionname = $"{m.Name}_{id++}"; //Generate unique names to take care of overloads
+                    var functionname = $"{m.Name}"; //Generate unique names to take care of overloads
                     var documentation = GetDocumentation(m);
                     var description = GetSummary(documentation);
                     var returns = GetReturns(documentation);
@@ -393,21 +400,15 @@ namespace Automation.GenerativeAI
                 _ = GetTools();
             }
 
-            var matches = new List<Tool>();
             foreach(var pair in tools)
             {
                 //Found exact match
                 if(pair.Value.Descriptor.Name.Equals(functionName) 
                     || pair.Key.Equals(functionName))
                     return pair.Value;
-
-                if (pair.Key.Contains(functionName))
-                {
-                    matches.Add(pair.Value);
-                }
             }
 
-            return matches.FirstOrDefault();
+            return null;
         }
 
         /// <summary>

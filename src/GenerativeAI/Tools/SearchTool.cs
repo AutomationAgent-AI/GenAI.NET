@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 
 namespace Automation.GenerativeAI.Tools
@@ -56,16 +57,22 @@ namespace Automation.GenerativeAI.Tools
         protected int count = 5;
 
         /// <summary>
-        /// The default parameter description for the search tool.
+        /// The query parameter description for the search tool.
         /// </summary>
-        public static readonly ParameterDescriptor Parameter = new ParameterDescriptor() { Name="query", Description="Text or query string to search.", Type=TypeDescriptor.StringType };
+        public static readonly ParameterDescriptor QueryParameter = new ParameterDescriptor() { Name="query", Description="Text or query string to search.", Type=TypeDescriptor.StringType };
         
+        /// <summary>
+        /// The context parameter for the search tool.
+        /// </summary>
+        public static readonly ParameterDescriptor ContextParameter = new ParameterDescriptor() { Name = "context", Description = "Context to search from", Required = false, Type = TypeDescriptor.StringType };
+
         /// <summary>
         /// Performs search
         /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public abstract Task<IEnumerable<SearchResult>> SearchAsync(string query);
+        /// <param name="query">What to search</param>
+        /// <param name="context">Optional parameter, Context from where to search</param>
+        /// <returns>Search results</returns>
+        public abstract Task<IEnumerable<SearchResult>> SearchAsync(string query, string context);
 
         /// <summary>
         /// Creates BingSearch tool with parameters
@@ -97,7 +104,7 @@ namespace Automation.GenerativeAI.Tools
         {
             if (!File.Exists(dbPath)) throw new FileNotFoundException(dbPath);
 
-            Func<IVectorStore> factory = () =>
+            Func<string, IVectorStore> factory = (ctx) =>
             {
                 var service = Application.GetAIService();
 
@@ -124,30 +131,34 @@ namespace Automation.GenerativeAI.Tools
             int chunkOverlap = 100, 
             TransformerType transformerType = TransformerType.OpenAIEmbedding)
         {
-            Func<IVectorStore> factory = () =>
-            {
-                //var textObjects = TextExtractorTool.ExtractTextObjects(source);
-                var textObjects = Enumerable.Repeat(TextObject.Create("RawText", source), 1);
-                var splitter = TextSplitter.WithParameters(chunkSize, chunkOverlap);
-
-                var splitTexts = new List<ITextObject>();
-                foreach (var txt in textObjects)
-                {
-                    var splits = splitter.Split(txt);
-                    splitTexts.AddRange(splits);
-                }
-
-                var service = Application.GetAIService();
-
-                var transformer = service.CreateVectorTransformer(transformerType);
-                var store = service.CreateVectorStore(transformer);
-
-                store.Add(splitTexts, true);
-
-                return store;
-            };
+            Func<string, IVectorStore> factory = (ctx) => CreateVectorStore(source, chunkSize, chunkOverlap, transformerType);
 
             return new SemanticSearch(factory);
+        }
+
+        private static IVectorStore CreateVectorStore(string source,
+            int chunkSize = 1000,
+            int chunkOverlap = 100,
+            TransformerType transformerType = TransformerType.OpenAIEmbedding)
+        {
+            var textObjects = TextExtractorTool.ExtractTextObjects(source);
+            var splitter = TextSplitter.WithParameters(chunkSize, chunkOverlap);
+
+            var splitTexts = new List<ITextObject>();
+            foreach (var txt in textObjects)
+            {
+                var splits = splitter.Split(txt);
+                splitTexts.AddRange(splits);
+            }
+
+            var service = Application.GetAIService();
+
+            var transformer = service.CreateVectorTransformer(transformerType);
+            var store = service.CreateVectorStore(transformer);
+
+            store.Add(splitTexts, true);
+
+            return store;
         }
 
         /// <summary>
@@ -165,10 +176,13 @@ namespace Automation.GenerativeAI.Tools
         protected override async Task<Result> ExecuteCoreAsync(ExecutionContext context)
         {
             var result = new Result();
-            var query = (string)context[Parameter.Name];
-            if (string.IsNullOrEmpty(query)) return result;
+            object query = string.Empty;
+            if (!context.TryGetValue(QueryParameter.Name, out query)) return result;
+            
+            object ctx = string.Empty;
+            context.TryGetValue(ContextParameter.Name, out ctx); //optional parameter
 
-            var results = await SearchAsync(query);
+            var results = await SearchAsync((string)query, (string)ctx);
             if(results != null && results.Any())
             {
                 result.success = true;
@@ -184,7 +198,7 @@ namespace Automation.GenerativeAI.Tools
         /// <returns>FunctionDescriptor</returns>
         protected override FunctionDescriptor GetDescriptor()
         {
-            return new FunctionDescriptor(Name, Description, new List<ParameterDescriptor>() { Parameter });
+            return new FunctionDescriptor(Name, Description, new List<ParameterDescriptor>() { QueryParameter, ContextParameter });
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Automation.GenerativeAI.Tools
     class SemanticSearch : SearchTool
     {
         private IVectorStore database;
-        private Func<IVectorStore> dbFactory;
+        private Func<string, IVectorStore> dbFactory;
 
         private SemanticSearch()
         {
@@ -21,16 +21,16 @@ namespace Automation.GenerativeAI.Tools
             database = store;
         }
 
-        public SemanticSearch(Func<IVectorStore> factory) : this()
+        public SemanticSearch(Func<string, IVectorStore> factory) : this()
         { 
             dbFactory = factory;
         }
 
-        public async override Task<IEnumerable<SearchResult>> SearchAsync(string query)
+        public async override Task<IEnumerable<SearchResult>> SearchAsync(string query, string context)
         {
             if(null == database)
             {
-                database = await Task.Run(dbFactory);
+                database = await Task.Run(() => dbFactory.Invoke(context));
             }
 
             return await Task.Run(() => {

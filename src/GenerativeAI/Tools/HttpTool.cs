@@ -57,12 +57,19 @@ namespace Automation.GenerativeAI.Tools
             return this;
         }
 
+        /// <summary>
+        /// Implements the execution logic
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         protected override async Task<Result> ExecuteCoreAsync(Interfaces.ExecutionContext context)
         {
             var result = new Result() { success = true, output = string.Empty };
 
-            string method = (string)context["method"];
             string uri = (string)context["uri"];
+            object method = null;
+            if (!context.TryGetValue("method", out method) || string.IsNullOrEmpty((string)method)) method = "GET";
+            
             object body = null;
             if (!context.TryGetValue("body", out body)) body = string.Empty;
 
@@ -95,6 +102,10 @@ namespace Automation.GenerativeAI.Tools
             return result;
         }
 
+        /// <summary>
+        /// Provides the descriptor of the tool
+        /// </summary>
+        /// <returns></returns>
         protected override FunctionDescriptor GetDescriptor()
         {
             var p1 = new ParameterDescriptor()
@@ -107,14 +118,16 @@ namespace Automation.GenerativeAI.Tools
             var p2 = new ParameterDescriptor()
             {
                 Name = "method",
-                Description = "HTTP request method such as GET/POST/DELETE",
+                Description = "HTTP request method such as GET/POST/DELETE, the default is GET",
                 Type = new EnumTypeDescriptor(new[] { "GET", "POST", "PUT", "DELETE" }),
+                Required = false
             };
             var p3 = new ParameterDescriptor()
             {
                 Name = "body",
                 Description = "The body of the request",
                 Type = TypeDescriptor.StringType,
+                Required = false
             };
 
             var function = new FunctionDescriptor(Name, Description,
@@ -164,7 +177,7 @@ namespace Automation.GenerativeAI.Tools
         /// <summary>Sends an HTTP request and returns the response content as a string.</summary>
         /// <param name="uri">The URI of the request.</param>
         /// <param name="method">The HTTP method for the request.</param>
-        /// <param name="requestContent">Optional request content.</param>
+        /// <param name="body">Optional request body.</param>
         /// <param name="cancellationToken">The token to use to request cancellation.</param>
         private async Task<string> SendRequestAsync(string uri, HttpMethod method, string body, CancellationToken cancellationToken)
         {
@@ -181,6 +194,10 @@ namespace Automation.GenerativeAI.Tools
             }
         }
 
+        /// <summary>
+        /// Disposes/releases the unmanaged resources.
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if(isDisposed) return;
@@ -192,6 +209,9 @@ namespace Automation.GenerativeAI.Tools
             isDisposed = true;
         }
 
+        /// <summary>
+        /// Disposes the unmanaged resources and suppresses GC finalization
+        /// </summary>
         public void Dispose()
         {
             // Dispose of unmanaged resources.

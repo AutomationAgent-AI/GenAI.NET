@@ -9,6 +9,8 @@ namespace Automation.GenerativeAI.Interfaces
     {
         private Dictionary<string, object> parameters = null;
 
+        internal IDictionary<string, object> GetParameters() { return parameters; }
+
         /// <summary>
         /// Default constructor
         /// </summary>

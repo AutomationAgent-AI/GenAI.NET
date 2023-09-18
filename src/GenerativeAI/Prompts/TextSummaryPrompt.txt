@@ -1,0 +1,6 @@
+﻿Write a coherent summary of the following in a story format. 
+If the text block doesn't contain any coherent narrative then please return 'NOT RELEVANT' without any commentary:
+
+{{$text}}
+
+COHERENT SUMMARY:
