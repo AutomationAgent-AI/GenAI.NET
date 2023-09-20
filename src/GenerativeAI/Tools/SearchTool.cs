@@ -104,7 +104,7 @@ namespace Automation.GenerativeAI.Tools
         {
             if (!File.Exists(dbPath)) throw new FileNotFoundException(dbPath);
 
-            Func<string, IVectorStore> factory = (ctx) =>
+            Func<IVectorStore> factory = () =>
             {
                 var service = Application.GetAIService();
 
@@ -131,9 +131,9 @@ namespace Automation.GenerativeAI.Tools
             int chunkOverlap = 100, 
             TransformerType transformerType = TransformerType.OpenAIEmbedding)
         {
-            Func<string, IVectorStore> factory = (ctx) => CreateVectorStore(source, chunkSize, chunkOverlap, transformerType);
+            Func<IVectorStore> factory = () => CreateVectorStore(source, chunkSize, chunkOverlap, transformerType);
 
-            return new SemanticSearch(factory);
+            return new SemanticSearch(factory, chunkSize, chunkOverlap);
         }
 
         private static IVectorStore CreateVectorStore(string source,

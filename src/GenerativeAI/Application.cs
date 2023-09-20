@@ -192,7 +192,7 @@ namespace Automation.GenerativeAI
             }
             else
             {
-                files = Enumerable.Repeat(source, 1);
+                files = Enumerable.Empty<string>();
             }
 
             return files.Where(f => extensions.Contains(Path.GetExtension(f).ToLower()));

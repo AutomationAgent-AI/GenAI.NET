@@ -410,5 +410,26 @@ namespace GenAIFramework.Test
             Assert.IsTrue(result.Contains("The capital of Jharkhand is Ranchi and 'Santhal' is the most popular language there."));
             Assert.IsTrue(result.Contains("The capital of MP is Bhopal and 'Hindi' is the most popular language there."));
         }
+
+        [TestMethod]
+        public async Task SemanticSearchWithContext()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Test, "SemanticSearchWithContext");
+
+            var file = Path.Combine(RootPath, @"..\..\..\..\..\tests\input\article.txt");
+            var context = new ExecutionContext();
+            context["context"] = File.ReadAllText(file);
+            context["query"] = "Meta has reported sales growth after how many quarters of decline?";
+
+            var tool = SearchTool.ForSemanticSearchFromSource(string.Empty).WithMaxResultCount(3);
+            Assert.IsNotNull(tool);
+
+            var result = await tool.ExecuteAsync(context);
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
+
+            var searchresults = FunctionTool.Deserialize<SearchResult[]>(result);
+            Assert.AreEqual(3, searchresults.Length);
+            Assert.IsTrue(searchresults.Any(r => r.content.Contains("three quarter")));
+        }
     }
 }

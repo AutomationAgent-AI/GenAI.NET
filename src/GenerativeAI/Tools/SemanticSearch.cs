@@ -9,7 +9,9 @@ namespace Automation.GenerativeAI.Tools
     class SemanticSearch : SearchTool
     {
         private IVectorStore database;
-        private Func<string, IVectorStore> dbFactory;
+        private Func<IVectorStore> dbFactory;
+        private int chunkSize = 1000;
+        private int chunkOverlap = 100;
 
         private SemanticSearch()
         {
@@ -21,8 +23,10 @@ namespace Automation.GenerativeAI.Tools
             database = store;
         }
 
-        public SemanticSearch(Func<string, IVectorStore> factory) : this()
-        { 
+        public SemanticSearch(Func<IVectorStore> factory, int chunkSize = 1000, int chunkOverlap = 100) : this()
+        {
+            this.chunkSize = chunkSize;
+            this.chunkOverlap = chunkOverlap;
             dbFactory = factory;
         }
 
@@ -30,7 +34,12 @@ namespace Automation.GenerativeAI.Tools
         {
             if(null == database)
             {
-                database = await Task.Run(() => dbFactory.Invoke(context));
+                database = await Task.Run(() => dbFactory.Invoke());
+            }
+
+            if (!string.IsNullOrEmpty(context))
+            {
+                UpdateStore(database, context, chunkSize, chunkOverlap);
             }
 
             return await Task.Run(() => {
@@ -45,6 +54,26 @@ namespace Automation.GenerativeAI.Tools
             var result = await base.ExecuteCoreAsync(context);
             context["database"] = database;
             return result;
+        }
+
+        private static IVectorStore UpdateStore(IVectorStore store, 
+            string source,
+            int chunkSize = 1000,
+            int chunkOverlap = 100)
+        {
+            var textObjects = TextExtractorTool.ExtractTextObjects(source);
+            var splitter = TextSplitter.WithParameters(chunkSize, chunkOverlap);
+
+            var splitTexts = new List<ITextObject>();
+            foreach (var txt in textObjects)
+            {
+                var splits = splitter.Split(txt);
+                splitTexts.AddRange(splits);
+            }
+
+            store.Add(splitTexts, true);
+
+            return store;
         }
     }
 }
