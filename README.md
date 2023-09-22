@@ -10,6 +10,7 @@ A .NET library to interact with Large Language Models such as OpenAI. This libra
 - Pipeline: Helps to create a pipeline of tools to execute them sequentially.
 - MapReduceTool: Helps to process large data set with a mapper tool in parallel and then reduce to the final output.
 - SearchTool: Helps to do a web search using Bing API
+- Agents: Can help you achieve some objectives by planning and executing actions based on the set of tools available to the agent.
 
 ## API Documentation
 [Documentation](https://github.com/automaze1/GenAI.NET/blob/main/docs/index.md)
