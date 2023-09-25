@@ -84,7 +84,7 @@ namespace Automation.GenerativeAI.Agents
                 new ParameterDescriptor(){Name = "error", Description = "Error string"}
             };
 
-            Tool = new DummyTool(new FunctionDescriptor("FinishAction", "The final action", parameters));
+            Tool = new ToolDescriptor("FinishAction", "The final action", parameters);
         }
 
         /// <summary>

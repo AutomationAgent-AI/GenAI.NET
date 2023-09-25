@@ -367,18 +367,18 @@ namespace GenAIFramework.Test
                                amount,Amount of units to edit,int";
 
             //Create function description without any execution logic.
-            var retval = Application.CreateFunctionDescription("EditFinancialForecast", "Makes an edit to users financial forecast model.", parameters);
-            Assert.AreEqual(1, retval);
+            var status = Application.CreateToolDescriptor("EditFinancialForecast", "Makes an edit to users financial forecast model.", parameters);
+            Assert.AreEqual("success", status);
 
             parameters = @"printer,Printer name";
             //Create function description without any execution logic.
-            retval = Application.CreateFunctionDescription("PrintFinancialForecast", "Sends the financial forecast for print", parameters);
-            Assert.AreEqual(2, retval);
+            status = Application.CreateToolDescriptor("PrintFinancialForecast", "Sends the financial forecast for print", parameters);
+            Assert.AreEqual("success", status);
 
             var tools = new List<string>() { "EditFinancialForecast", "PrintFinancialForecast" };
             var agent = "ForecastAgent";
 
-            var status = Application.CreateAgent(agent, tools, 3, string.Empty);
+            status = Application.CreateAgent(agent, tools, 3, string.Empty);
             Assert.AreEqual("success", status);
 
             var objective = @"Please do three things, add an amount of 40 units to year 2023 headcount 

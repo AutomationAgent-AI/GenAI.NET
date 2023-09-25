@@ -1,13 +1,16 @@
 ﻿using Automation.GenerativeAI;
+using Automation.GenerativeAI.Agents;
 using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Tools;
+using Automation.GenerativeAI.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace FunctionTools
@@ -53,11 +56,15 @@ namespace FunctionTools
             //await SimpleChat();
             //await LatestNews();
 
-            //await BrowsePage(@"https://www.google.com/finance/?hl=en");
+            //await BrowsePage(@"https://twitter.com/search?q=Chandrayan");
 
             //await ExtractData();
 
-            await Task.Run(() => SynchronousExtractData());
+            //await Task.Run(() => SynchronousExtractData());
+
+            //WikiSearch("Chandrayaan-3");
+
+            await WikiSearch();
         }
 
         static async Task DemoBasicConversationUsingLanguageModel()
@@ -135,7 +142,7 @@ namespace FunctionTools
 
         static void CreateFunctionDemo()
         {
-            int id = Application.CreateFunctionDescription(
+            var status = Application.CreateToolDescriptor(
                 "GetCurrentWeather", 
                 "Gets the current weather information of a city.", 
                 "location,The name of a city for which weather information is needed, string");
@@ -144,7 +151,7 @@ namespace FunctionTools
 
             if (response.Contains("function_call"))
             {
-                response = Application.AddFunctionMessage("test", "GetCurrentWeather", "{\"temperature\": 22, \"unit\": \"celsius\", \"description\": \"Sunny\"}", 0.8);
+                response = Application.AddToolResponseToConversation("test", "GetCurrentWeather", "{\"temperature\": 22, \"unit\": \"celsius\", \"description\": \"Sunny\"}", 0.8);
             }
 
             Console.WriteLine(response);
@@ -489,7 +496,7 @@ namespace FunctionTools
                   request to check if any function call is required, if so extract all
                   parameters based on the function sepcification. Extract arguments and values
                   only based on function specification provided, do not include extra parameter. If required feel
-                  free to browse a given link to get more insight on the available data.";
+                  free to browse a given link to get more insight on the available data. Please provide your reasoning in the response";
 
             //chat.AppendMessage(msg, Role.system);
 
@@ -538,5 +545,58 @@ namespace FunctionTools
 
             Console.WriteLine($"{response.role}: {response.content}");
         }
+
+        static void WikiSearch(string query)
+        {
+            var prompt = PromptTool.WithTemplate("https://wikipedia.org/w/index.php?search={{$query}}");
+            var httpget = HttpTool.WithClient();
+
+            //Create function tool from DLL and class name
+            var toolset = new DLLFunctionTools(@"GenerativeAI.Tools.dll", "Automation.GenerativeAI.Tools.WebContentExtractor");
+
+            var extractor = toolset.GetTool("GetTextFromHtml");
+
+            var pipeline = Pipeline.WithTools(new[] {prompt, httpget, extractor});
+
+            var context = new ExecutionContext();
+            context["query"] = query;
+            //context["method"] = "GET";
+            var text = pipeline.ExecuteAsync(context).GetAwaiter().GetResult();
+
+            Console.Write(text);
+            Console.ReadLine();
+        }
+
+        static async Task WikiSearch()
+        {
+            Logger.SetLogFile("Sample.log");
+            var prompt = PromptTool.WithTemplate("https://wikipedia.org/w/index.php?search={{$query}}");
+            var httpget = HttpTool.WithClient();
+
+            //Create function tool from DLL and class name
+            var toolset = new DLLFunctionTools(@"GenerativeAI.Tools.dll", "Automation.GenerativeAI.Tools.WebContentExtractor");
+
+            var extractor = toolset.GetTool("GetTextFromHtml");
+
+            var responses = new Dictionary<string, string>() { { "Text", "Here is my text summary" } };
+            var llm = new MockLanguageModel("Test", responses);
+
+            var mapperPrompt = "Provide me one para summary of the following article. \n {{$article}}";
+            var reducerPrompt = "Summarize the following texts in a clear and concise short article not more than 250 words.\n\n {{$article}}";
+            var summarizer = TextSummarizer.WithMapReduce().WithLanguageModel(llm);
+
+            var wikisearch = Pipeline.WithTools(new[] { prompt, httpget, extractor, summarizer })
+                                   .WithName("WikiSearch")
+                                   .WithDescription("Searches wikipedia to provide relevant information on a topic or personality!");
+
+            var ctx = new ExecutionContext();
+            ctx["query"] = "Parmanu: The Story of Pokhran";
+
+            var result = await wikisearch.ExecuteAsync(ctx);
+            Console.WriteLine(result);
+            Console.ReadLine();
+        }
+
+        
     }
 }

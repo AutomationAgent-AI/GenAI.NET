@@ -59,8 +59,9 @@ namespace Automation.GenerativeAI.Stores
 
         public void Add(IEnumerable<ITextObject> textObjects, bool savetext)
         {
+            var validtxts = textObjects.Where(x => !string.IsNullOrEmpty(x.Text));
             int i = 0;
-            Parallel.ForEach(textObjects, txt =>
+            Parallel.ForEach(validtxts, txt =>
             {
                 var vec = transformer.Transform(txt.Text);
                 vectors.Add(vec);

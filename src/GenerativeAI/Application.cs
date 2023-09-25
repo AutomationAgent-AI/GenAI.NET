@@ -15,12 +15,13 @@ using ExecutionContext = Automation.GenerativeAI.Interfaces.ExecutionContext;
 
 namespace Automation.GenerativeAI
 {
-    class DummyTool : IFunctionTool
+    class ToolDescriptor : IFunctionTool
     {
-        public DummyTool(FunctionDescriptor descriptor) 
+        public ToolDescriptor(string name, string description, IEnumerable<ParameterDescriptor> parameters) 
         {
-            Descriptor = descriptor;
+            Descriptor = new FunctionDescriptor(name, description, parameters);
         }
+
         public string Name => Descriptor.Name;
 
         public FunctionDescriptor Descriptor { get; set; }
@@ -192,7 +193,7 @@ namespace Automation.GenerativeAI
             }
             else
             {
-                files = Enumerable.Repeat(source, 1);
+                files = Enumerable.Empty<string>();
             }
 
             return files.Where(f => extensions.Contains(Path.GetExtension(f).ToLower()));
@@ -305,14 +306,19 @@ namespace Automation.GenerativeAI
         }
 
         /// <summary>
-        /// Creates a function description that can be passed to language model
+        /// Creates a tool descriptor that can be passed to the language model or Agent as a tool.
+        /// This tool doesn't have any execution logic and when required client can perform custom
+        /// logic for its execution.
         /// </summary>
-        /// <param name="name">Name of the function</param>
-        /// <param name="description">Description of the function</param>
+        /// <param name="name">Name of the tool</param>
+        /// <param name="description">Description of the tool</param>
         /// <param name="parametersTableCSVAsText">A table to contain parameter name, description and type</param>
-        /// <returns>Returns function id</returns>
-        public static int CreateFunctionDescription(string name, string description, string parametersTableCSVAsText)
+        /// <returns>Status of the operation.</returns>
+        public static string CreateToolDescriptor(string name, string description, string parametersTableCSVAsText)
         {
+            var tool = toolsCollection.GetTool(name);
+            if (tool != null) return $"ERROR: A tool with name, '{name}' already exists!!";
+
             List<ParameterDescriptor> parameterDescriptors = new List<ParameterDescriptor>();
 
             var lines = parametersTableCSVAsText.Split('\n');
@@ -359,11 +365,10 @@ namespace Automation.GenerativeAI
                 parameterDescriptors.Add(descriptor);
             }
 
-            var function = new FunctionDescriptor(name, description, parameterDescriptors);
-            var tool = new DummyTool(function);
+            tool = new ToolDescriptor(name, description, parameterDescriptors);
             toolsCollection.AddTool(tool);
 
-            return toolsCollection.Count();
+            return "success";
         }
 
         /// <summary>
@@ -381,14 +386,16 @@ namespace Automation.GenerativeAI
         }
 
         /// <summary>
-        /// Adds a function message as a response to function_call message to a given conversation.
+        /// When the language model returns a function_call message for any tool, that tool
+        /// needs to be executed by client and the response of that execution can be registered
+        /// using this method.
         /// </summary>
         /// <param name="sessionid">The session id for the conversation.</param>
-        /// <param name="functionName">Name of the function that was executed.</param>
-        /// <param name="message">Output returned from the function call as string(json).</param>
+        /// <param name="toolName">Name of the function that was executed.</param>
+        /// <param name="response">Output returned by the given tool as string(json).</param>
         /// <param name="temperature">A value between 0 and 1 to control the randomness of the response.</param>
         /// <returns>The response from the language model.</returns>
-        public static string AddFunctionMessage(string sessionid, string functionName, string message, double temperature)
+        public static string AddToolResponseToConversation(string sessionid, string toolName, string response, double temperature)
         {
             var chat = GetAIService().GetConversation(sessionid);
 
@@ -397,7 +404,7 @@ namespace Automation.GenerativeAI
                 return $"ERROR: Invalid session id, there is no existing conversation with the session id {sessionid}";
             }
 
-            chat.AppendMessage(new FunctionMessage(functionName, message));
+            chat.AppendMessage(new FunctionMessage(toolName, response));
 
             var msg = chat.GetResponseAsync(temperature).GetAwaiter().GetResult();
             if (msg is FunctionCallMessage)

@@ -26,13 +26,40 @@ namespace Automation.GenerativeAI.Agents
     /// </summary>
     public abstract class Agent
     {
+        /// <summary>
+        /// List of messages to record message history
+        /// </summary>
         protected List<ChatMessage> Messages = new List<ChatMessage>();
+
+        /// <summary>
+        /// Collection of allowed tools for agent to use.
+        /// </summary>
         protected ToolsCollection Tools;
+
+        /// <summary>
+        /// System prompt string
+        /// </summary>
         protected string SystemPrompt;
+
+        /// <summary>
+        /// LLM temperature setting
+        /// </summary>
         protected double Temperature = 0.8;
+
+        /// <summary>
+        /// Language model set by the client
+        /// </summary>
         private ILanguageModel languageModel;
-        private int MaxAllowedSteps = 10;
-        private List<AgentAction> Steps = new List<AgentAction>();
+
+        /// <summary>
+        /// Maximum number of allowed steps
+        /// </summary>
+        protected int MaxAllowedSteps = 10;
+
+        /// <summary>
+        /// Steps taken by the agent so far
+        /// </summary>
+        protected List<AgentAction> Steps = new List<AgentAction>();
 
         /// <summary>
         /// Name of the Agent

@@ -45,7 +45,8 @@ namespace Automation.GenerativeAI.Tools
             if(tools.Count > 0)
             {
                 //If the follow up tool has more than one parameter then it can't be added
-                if (tool.Descriptor.Parameters.Properties.Count(p => !p.Name.StartsWith("Result.") && p.Required) > 1)
+                var requiredParameters = GetMandatoryParameters(tool);
+                if (requiredParameters.Count > 1)
                 {
                     Logger.WriteLog(LogLevel.Warning, LogOps.Result, $"Tool: {tool.Name} has more than one input parameter, hence can't be added to the pipeline");
                     return false;
@@ -73,13 +74,7 @@ namespace Automation.GenerativeAI.Tools
             var currentctx = context;
             foreach (IFunctionTool tool in tools)
             {
-                var requiredParameters = tool.Descriptor.Parameters.Properties.Where(p => p.Required && !p.Name.StartsWith("Result.")).ToList();
-                if (!string.IsNullOrEmpty(result) && requiredParameters.Count == 1)
-                {
-                    var descriptor = tool.Descriptor;
-                    currentctx = new ExecutionContext();
-                    currentctx[requiredParameters[0].Name] = result;
-                }
+                currentctx = GetExecutionContext(tool, context, result);
 
                 result = await tool.ExecuteAsync(currentctx);
 
@@ -115,6 +110,44 @@ namespace Automation.GenerativeAI.Tools
             }
 
             return new FunctionDescriptor(Name, Description, parameters);
+        }
+
+
+        /// <summary>
+        /// Gets the list of mandatory parameters for a given function tool. The parameters that
+        /// are bound with input or result of other tool are not considered as mandatory parameters.
+        /// </summary>
+        /// <param name="tool">The tool</param>
+        /// <returns>List of parameters</returns>
+        private List<ParameterDescriptor> GetMandatoryParameters(IFunctionTool tool)
+        {
+            var parameters = tool.Descriptor.Parameters.Properties;
+            return parameters.Where(p => p.Required && !p.Name.StartsWith("Result.") && !p.Name.StartsWith("Input.")).ToList();
+        }
+
+
+        private ExecutionContext GetExecutionContext(IFunctionTool tool, ExecutionContext context, string previousResult)
+        {
+            var newContext = new ExecutionContext();
+            var parameters = tool.Descriptor.Parameters.Properties;
+            foreach (var parameter in parameters)
+            {
+                if(parameter.Name.StartsWith("Input."))
+                {
+                    var name = parameter.Name.Substring(6);
+                    newContext[parameter.Name] = context[name];
+                }
+                else if(context.TryGetValue(parameter.Name, out var value)) 
+                {
+                    newContext[parameter.Name] = value;
+                }
+                else
+                {
+                    newContext[parameter.Name] = previousResult;
+                }
+            }
+
+            return newContext;
         }
     }
 }

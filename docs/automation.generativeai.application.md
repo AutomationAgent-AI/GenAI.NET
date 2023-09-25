@@ -274,29 +274,31 @@ Returns the AI assitant's response.
 
 [Exception](https://docs.microsoft.com/en-us/dotnet/api/system.exception)<br>
 
-### **CreateFunctionDescription(String, String, String)**
+### **CreateToolDescriptor(String, String, String)**
 
-Creates a function description that can be passed to language model
+Creates a tool descriptor that can be passed to the language model or Agent as a tool.
+ This tool doesn't have any execution logic and when required client can perform custom
+ logic for its execution.
 
 ```csharp
-public static int CreateFunctionDescription(string name, string description, string parametersTableCSVAsText)
+public static string CreateToolDescriptor(string name, string description, string parametersTableCSVAsText)
 ```
 
 #### Parameters
 
 `name` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-Name of the function
+Name of the tool
 
 `description` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-Description of the function
+Description of the tool
 
 `parametersTableCSVAsText` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 A table to contain parameter name, description and type
 
 #### Returns
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-Returns function id
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Status of the operation.
 
 ### **AddToolsFromDLL(String)**
 
@@ -316,12 +318,14 @@ Full path of the DLL
 [List&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1)<br>
 List of the tools name that got added to the tools collection.
 
-### **AddFunctionMessage(String, String, String, Double)**
+### **AddToolResponseToConversation(String, String, String, Double)**
 
-Adds a function message as a response to function_call message to a given conversation.
+When the language model returns a function_call message for any tool, that tool
+ needs to be executed by client and the response of that execution can be registered
+ using this method.
 
 ```csharp
-public static string AddFunctionMessage(string sessionid, string functionName, string message, double temperature)
+public static string AddToolResponseToConversation(string sessionid, string toolName, string response, double temperature)
 ```
 
 #### Parameters
@@ -329,11 +333,11 @@ public static string AddFunctionMessage(string sessionid, string functionName, s
 `sessionid` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 The session id for the conversation.
 
-`functionName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`toolName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 Name of the function that was executed.
 
-`message` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-Output returned from the function call as string(json).
+`response` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Output returned by the given tool as string(json).
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
 A value between 0 and 1 to control the randomness of the response.
