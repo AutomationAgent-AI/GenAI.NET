@@ -22,7 +22,10 @@ namespace GenAIFramework.Test
             {
                 { "What is the weather like in Boston?", "The weather in Boston is cold" },
                 { "What is the weather like in San Francisco?", "The weather in San Francisco is warm" },
-                { "sales growth after", "Facebook parent Meta reported a return to sales growth after three quarters of\r\ndeclines." }
+                { "sales growth after", "Facebook parent Meta reported a return to sales growth after three quarters of\r\ndeclines." },
+                { "imparts wisdom and guides people", "Roger had 5 balls and 2 cans so now he has 9 balls in total." },
+                { "looks at answers and finds", "Roger has 5 balls initially and buys 2 cans. Each can contains 3 balls so now he has 5 + 2 x 3 = 11 balls." },
+                { "reviews answers and critiques", "Roger has 11 balls" },
             };
 
             return new MockLanguageModel("Mock", responses);
@@ -317,6 +320,46 @@ namespace GenAIFramework.Test
 
             Assert.IsTrue(!string.IsNullOrEmpty(result));
             Assert.IsTrue(result.Contains("three quarters"));
+        }
+
+        [TestMethod]
+        public async Task RCIChainPipelineWithInputBinding()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Test, "RCIChainPipelineWithInputBinding");
+
+            var questionPrompt = @"You are a helpful assistant that imparts wisdom and guides people with accurate answers.
+Question: {{$question}}
+Answer: ";
+            var critiquePrompt = @"You are a helpful assistant that looks at answers and finds what is wrong with them based on the original question given.
+
+Question: {{$Input.question}}
+
+Answer Given:{{$initial_answer}}
+
+Review your previous answer and find problems with your answer.";
+
+            var imrpovementPrompt = @"You are a helpful assistant that reviews answers and critiques based on the original question given and write a new improved final answer.
+
+Question: {{$Input.question}}
+
+Answer Given:{{$Result.Query}}
+
+Constructive Criticism:{{$critique}} Based on the problems you found, improve your answer.
+
+Final Answer:";
+
+            //var llm = new OpenAILanguageModel("gpt-3.5-turbo");
+            var prompts = new Dictionary<string, string> { { questionPrompt, "Query"}, { critiquePrompt, "Critique" }, { imrpovementPrompt, "Improvise" } };
+            var tools = prompts.Select(p => QueryTool.WithPromptTemplate(p.Key).WithLanguageModel(LanguageModel).WithName(p.Value)).ToList();
+
+            var pipeline = Pipeline.WithTools(tools);
+            Assert.IsNotNull(pipeline);
+
+            var context = new ExecutionContext();
+            context["question"] = "Roger has 5 tenis balls. He buys 2 more cans of tennis balls each with 3 balls. How many tennis balls he has now?";
+
+            var result = await pipeline.ExecuteAsync(context);
+            Assert.IsTrue(result.Contains("11"));
         }
 
         [TestMethod]
