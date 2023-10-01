@@ -177,7 +177,7 @@ namespace GenAIFramework.Test
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
-            context["source"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input\Chandralekha.pdf");
+            context["input"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input\Chandralekha.pdf");
             var result = await tool.ExecuteAsync(context);
             Assert.IsTrue(result.StartsWith("Chandralekha"));
             Assert.IsTrue(result.Contains("Mayabazar"));
@@ -236,7 +236,7 @@ namespace GenAIFramework.Test
             Assert.IsNotNull(tool);
 
             var context = new ExecutionContext();
-            context["source"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input");
+            context["input"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input");
             var result = await tool.ExecuteAsync(context);
             Assert.IsTrue(result.Contains("Chandralekha"));
             Assert.IsTrue(result.Contains("Mayabazar"));

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Automation.GenerativeAI.Tools
 {
@@ -37,7 +39,7 @@ namespace Automation.GenerativeAI.Tools
         /// <summary>
         /// List of attachments in the email.
         /// </summary>
-        public List<string> Attachments { get; set; }
+        public List<string> Attachments { get; set; } = new List<string>();
     }
 
     /// <summary>
@@ -124,17 +126,52 @@ namespace Automation.GenerativeAI.Tools
         }
 
         /// <summary>
+        /// Reads email from outlook inbox based on given filters and downloads all the attachments to the filtered emails.
+        /// </summary>
+        /// <param name="mailboxFolder">Mailbox folder path.</param>
+        /// <param name="sender">Sender whose email needs to be read. If empty, then email from all senders will be read.</param>
+        /// <param name="subjectFilter">Email with specfic subject to be read. If empty, all emails will be read.</param>
+        /// <param name="fromDate">A date filter for email indicating all emails from this date to be read. Date needs to be in dd/MM/yyyy format.</param>
+        /// <param name="toDate">A date filter for email indicating all emails up to this date to be read. Date needs to be in dd/MM/yyyy format.</param>
+        /// <param name="limit">Maximum number of emails to be returned.</param>
+        /// <param name="downloadFolder">Full path of a folder where attachments to be downloaded. If it is empty
+        /// <returns>Download status</returns>
+        public static string DownloadEmailAttachments(string mailboxFolder, string sender, string subjectFilter, string fromDate, string toDate, int limit, string downloadFolder)
+        {
+            var emails = GetEmailsCore(sender, subjectFilter, mailboxFolder, fromDate, toDate, limit, downloadFolder).ToArray();
+            var withattachments = emails.Where(e => e.Attachments != null && e.Attachments.Count > 0).ToArray();
+            var total = withattachments.Sum(e => e.Attachments.Count);
+            return $"Total emails read: {emails.Length}, Emails with attachments: {withattachments.Length}, Total attachments: {total}.";
+        }
+
+        /// <summary>
+        /// Gets top emails based on the given email filters on sender, subject or timeframe.
+        /// </summary>
+        /// <param name="mailboxFolder">Mailbox folder path.</param>
+        /// <param name="sender">Sender whose email needs to be read. If empty, then email from all senders will be read.</param>
+        /// <param name="subjectFilter">Email with specfic subject to be read. If empty, all emails will be read.</param>
+        /// <param name="fromDate">A date filter for email indicating all emails from this date to be read. Date needs to be in dd/MM/yyyy format.</param>
+        /// <param name="toDate">A date filter for email indicating all emails up to this date to be read. Date needs to be in dd/MM/yyyy format.</param>
+        /// <param name="limit">Maximum number of emails to be returned. This number can't be more than 20.</param>
+        /// <returns>List of email messages</returns>
+        public static IEnumerable<EmailMessage> GetTopEmails(string mailboxFolder, string sender, string subjectFilter, string fromDate, string toDate, int limit)
+        {
+            if(limit > 20) limit = 20;
+            return GetEmailsCore(sender, subjectFilter, mailboxFolder, fromDate, toDate, limit, string.Empty);
+        }
+
+        /// <summary>
         /// Gets/Reads email from the outlook inbox
         /// </summary>
         /// <param name="sender">Sender whose email needs to be read. If empty, then email from all senders will be read.</param>
         /// <param name="subjectFilter">Email with specfic subject to be read. If empty, all emails will be read.</param>
-        /// <param name="fromDate">Emails not older than fromDate to be read. Date needs to be in dd/MM/yyyy format.</param>
-        /// <param name="toDate">Emails not newer than toDate to be read. Date needs to be in dd/MM/yyyy format.</param>
+        /// <param name="fromDate">A date filter for email indicating all emails from this date to be read. Date needs to be in dd/MM/yyyy format.</param>
+        /// <param name="toDate">A date filter for email indicating all emails up to this date to be read. Date needs to be in dd/MM/yyyy format.</param>
         /// <param name="count">Maximum number of eamils to be returned.</param>
         /// <param name="downloadFolder">Full path of a folder where attachments to be downloaded. If it is empty
         /// attachments will not be downloaded.</param>
         /// <returns>List of email messages</returns>
-        public static IEnumerable<EmailMessage> GetEmails(string sender, string subjectFilter, string fromDate, string toDate, int count, string downloadFolder)
+        private static IEnumerable<EmailMessage> GetEmailsCore(string sender, string subjectFilter, string mailboxFolder, string fromDate, string toDate, int count, string downloadFolder)
         {
             List<EmailMessage> emails = new List<EmailMessage>();
             bool downloadAttachments = !string.IsNullOrWhiteSpace(downloadFolder) && Directory.Exists(downloadFolder);
@@ -144,7 +181,16 @@ namespace Automation.GenerativeAI.Tools
                 var outlookNamespace = outlookApp.GetNamespace("MAPI");
 
                 // Get the Inbox folder
-                MAPIFolder inboxFolder = outlookNamespace.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                MAPIFolder mailFolder = outlookNamespace.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+
+                if (!string.IsNullOrEmpty(mailboxFolder))
+                {
+                    var folder = GetEmailFolder(outlookNamespace, mailboxFolder, null);
+                    if(folder != null)
+                    {
+                        mailFolder = folder;
+                    }
+                }
 
                 sender = sender.ToLower();
                 subjectFilter = subjectFilter.ToLower();
@@ -160,7 +206,7 @@ namespace Automation.GenerativeAI.Tools
                 }
                 else
                 {
-                    toDate = DateTime.Now.ToShortDateString();
+                    toDate = DateTime.Now.AddDays(1).ToShortDateString();
                 }
 
                 if (DateTime.TryParseExact(fromDate, "dd/MM/yyyy", provider, DateTimeStyles.None, out date))
@@ -181,9 +227,9 @@ namespace Automation.GenerativeAI.Tools
                 }
 
                 filter = $"[ReceivedTime] >= '{fromDate}' AND [ReceivedTime] <= '{toDate}'";
-                
+
                 // Retrieve the emails in the Inbox folder
-                Items mailitems = inboxFolder.Items.Restrict(filter);
+                Items mailitems = mailFolder.Items.Restrict(filter);
                 mailitems.Sort("[ReceivedTime]", true);
                 int totalMails = mailitems.Count;
                 int itemCount = 0;
@@ -197,22 +243,29 @@ namespace Automation.GenerativeAI.Tools
                     if (itemCount >= count) break;
 
                     var name = mail.SenderName.ToLower();
+                    var addressEntry = mail.Sender;
                     var emailaddress = mail.SenderEmailAddress.ToLower();
+                    if (addressEntry.Type == "SMTP")
+                    {
+                        emailaddress = addressEntry.Address;
+                    }
+                    else if(addressEntry.Type == "EX")
+                    {
+                        emailaddress = addressEntry.GetExchangeUser().PrimarySmtpAddress;
+                    }
+                    
+                    var addressType = mail.SenderEmailType;
+                    
 
                     if (!string.IsNullOrWhiteSpace(sender) && (!name.Contains(sender) || !emailaddress.Contains(sender))) continue;
 
                     var subject = mail.Subject.ToLower();
                     if (!string.IsNullOrEmpty(subjectFilter) && !subject.Contains(subjectFilter)) continue;
 
-                    //remove anything after Original Message text
-                    var body = mail.Body;
-                    var idx = body.IndexOf("--------------- Original Message ---------------");
-                    if(idx > 0)
-                    {
-                        body = body.Substring(0, idx);
-                    }
+                    //Get a clean email message
+                    var body = CleanupEmailBody(mail.Body);
 
-                    var email = new EmailMessage() { From = mail.SenderName, Subject = mail.Subject, Message = body, SentDate = mail.SentOn.ToShortDateString() };
+                    var email = new EmailMessage() { From = emailaddress, Subject = mail.Subject, Message = body, SentDate = mail.SentOn.ToShortDateString() };
                     email.Attachments = new List<string>();
                     if (mail.Attachments.Count > 0)
                     {
@@ -292,6 +345,40 @@ namespace Automation.GenerativeAI.Tools
             {
                 throw new System.Exception(ex.Message, ex);
             }
+        }
+
+        private static string CleanupEmailBody(string body)
+        {
+            Regex regex = new Regex(@"From:[\s\w\/\.@<>\r]+\nSent:[\s\w\,\:\r]+\nTo:[\s\w\/\.@<>\r]+");
+            var match = regex.Match(body);
+            var msg = regex.Split(body).First().Trim();
+
+            //Remove http links from the message
+            var links = new Regex(@"<(ftp:\/\/|www\.|https?:\/\/){1}[a-zA-Z0-9u00a1-\uffff0-]{2,}\.[a-zA-Z0-9u00a1-\uffff0-]{2,}(\S*)>");
+            msg = links.Replace(msg, string.Empty);
+
+            //Remove large words from the message, most likely some garbage
+            var largeword = new Regex(@"[\w\-_\.]{100,}");
+            msg = largeword.Replace(msg, string.Empty);
+
+            return msg;
+        }
+
+        private static MAPIFolder GetEmailFolder(NameSpace outlookNameSpace, string mailboxFolder, MAPIFolder parent)
+        {
+            Folders folders = outlookNameSpace.Folders;
+            
+            if(parent != null) { folders = parent.Folders; }
+
+            foreach (MAPIFolder folder in folders)
+            {
+                if (folder.FolderPath == mailboxFolder || folder.FullFolderPath == mailboxFolder || folder.FolderPath.EndsWith($@"\{mailboxFolder}")) return folder;
+
+                var f = GetEmailFolder(outlookNameSpace, mailboxFolder, folder);
+                if(f != null) return f;
+            }
+
+            return null;
         }
     }
 }

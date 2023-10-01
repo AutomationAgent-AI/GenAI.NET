@@ -209,7 +209,7 @@ namespace Automation.GenerativeAI.Tools
         {
             var result = new Result();
 
-            var text = (string)context["text"];
+            var text = (string)context[Descriptor.InputParameters.First()];
 
             var dict = await ExtractDataAsync(text);
 
@@ -228,8 +228,8 @@ namespace Automation.GenerativeAI.Tools
                 var names = string.Join(", ", parameters.Select(p => p.Name));
                 Description = $"Extracts parameters: '{names}' from the input text.";
             }
-            var input = new ParameterDescriptor() { Name = "text", Description = "Raw text from where parameters needs to be extracted." };
-            var function = new FunctionDescriptor(Name, Description, Enumerable.Repeat(input, 1));
+            var input = new ParameterDescriptor() { Name = "input", Description = "Raw text from where parameters needs to be extracted." };
+            var function = new FunctionDescriptor(Name, Description, new[] { input });
 
             return function;
         }

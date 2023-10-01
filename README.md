@@ -1,16 +1,16 @@
 # GenAI.NET
 A .NET library to interact with Large Language Models such as OpenAI. This library provides the following features.
-- Language Model: A default language model to connect to OpenAI and get a response.
-- Function Calling: The language mode implementation allows users to pass a list of function descriptions to the language model for extraction of functions and parameters from the request.
-- GenerativeAI Service: A convenient service interface to provide some high-level functions.
-- Conversation: An interface to interact with the language model while retaining the conversation chain in memory. It also can refer to additional context using vector stores to get a meaningful response based on some documents.
-- Function Toolset: An interface that can provide supported function descriptions and execute them. This function tool can be passed to the conversation so that related functions from the tool can be executed if needed.
-- DLLFunctionToolset: Wraps all the public static methods of a .NET class from a given DLL into a function toolset. This module refers to the documentation of the static methods to create function descriptions.
-- PromptTemplate: Helps you to parameterize your prompts with a template string. You can define a template string with the template variables denoted as {{ $input }}
+- **Language Model:** A default language model to connect to OpenAI and get a response.
+- **Function Calling:** The language mode implementation allows users to pass a list of function descriptions to the language model for extraction of functions and parameters from the request.
+- **GenerativeAI Service:** A convenient service interface to provide some high-level functions.
+- **Conversation:** An interface to interact with the language model while retaining the conversation chain in memory. It also can refer to additional context using vector stores to get a meaningful response based on some documents.
+- **Function Toolset:** An interface that can provide supported function descriptions and execute them. This function tool can be passed to the conversation so that related functions from the tool can be executed if needed.
+- **DLLFunctionToolset:** Wraps all the public static methods of a .NET class from a given DLL into a function toolset. This module refers to the documentation of the static methods to create function descriptions.
+- **PromptTemplate:** Helps you to parameterize your prompts with a template string. You can define a template string with the template variables denoted as {{ $input }}
 - Pipeline: Helps to create a pipeline of tools to execute them sequentially.
-- MapReduceTool: Helps to process large data set with a mapper tool in parallel and then reduce to the final output.
-- SearchTool: Helps to do a web search using Bing API
-- Agents: Can help you achieve some objectives by planning and executing actions based on the set of tools available to the agent.
+- **MapReduceTool:** Helps to process large data set with a mapper tool in parallel and then reduce to the final output.
+- **SearchTool:** Helps to do a web search using Bing API
+- **Agents:** Can help you achieve some objectives by planning and executing actions based on the set of tools available to the agent.
 
 ## API Documentation
 [Documentation](https://github.com/automaze1/GenAI.NET/blob/main/docs/index.md)
