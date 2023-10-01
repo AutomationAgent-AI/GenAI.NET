@@ -22,9 +22,9 @@ namespace Automation.GenerativeAI.Tools
             Description = "Extracts text from a given one or more source text file or pdf from a directory";
             parameter = new ParameterDescriptor()
             {
-                Name = "source",
+                Name = "input",
                 Type = TypeDescriptor.StringType,
-                Description = "Full path of the source file or folder from where text needs to be extracted"
+                Description = "Full path of the input file or folder from where text needs to be extracted"
             };
         }
 

@@ -126,7 +126,7 @@ namespace GenAIFramework.Test
             Assert.AreEqual("success", status);
 
             var context = new Dictionary<string, object>();
-            context["source"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input\Chandralekha.pdf");
+            context["input"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input\Chandralekha.pdf");
             var result = Application.ExecuteTool(tool, FunctionTool.ToJsonString(context));
             Assert.IsTrue(result.StartsWith("Chandralekha"));
             Assert.IsTrue(result.Contains("Mayabazar"));
@@ -143,7 +143,7 @@ namespace GenAIFramework.Test
             Assert.AreEqual("success", status);
 
             var context = new Dictionary<string, object>();
-            context["source"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input");
+            context["input"] = Path.Combine(RootPath, @"..\..\..\..\..\tests\input");
             var result = Application.ExecuteTool(tool, FunctionTool.ToJsonString(context));
             Assert.IsTrue(result.Contains("Chandralekha"));
             Assert.IsTrue(result.Contains("Mayabazar"));

@@ -16,7 +16,7 @@ namespace Automation.GenerativeAI.Tools
         /// <summary>
         /// The input text parameter description for the TextSummarizer tool.
         /// </summary>
-        public static readonly ParameterDescriptor Parameter = new ParameterDescriptor() { Name = "text", Description = "Text to summarize." };
+        public static readonly ParameterDescriptor Parameter = new ParameterDescriptor() { Name = "input", Description = "Text to summarize." };
 
         /// <summary>
         /// Creates a text summarizer tool with map reduce algorithm

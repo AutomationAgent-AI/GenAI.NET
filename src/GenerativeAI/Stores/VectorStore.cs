@@ -98,6 +98,8 @@ namespace Automation.GenerativeAI.Stores
 
         public static VectorStore Create(string recepiefile)
         {
+            System.Diagnostics.Debugger.Break();
+
             var ext = Path.GetExtension(recepiefile);
             if (ext.ToLower().Contains("vdb"))
             {
@@ -119,11 +121,12 @@ namespace Automation.GenerativeAI.Stores
                 using (var gzip = new GZipStream(stream, CompressionMode.Decompress, true))
                 {
                     int nVectors = (int)formatter.Deserialize(gzip);
+                    int nVectorLength = 0;
                     for (int i = 0; i < nVectors; ++i)
                     {
-                        var veclen = (int)formatter.Deserialize(gzip);
-                        var vector = new double[veclen];
-                        for(int j = 0; j < veclen; ++j)
+                        nVectorLength = (int)formatter.Deserialize(gzip);
+                        var vector = new double[nVectorLength];
+                        for (int j = 0; j < nVectorLength; ++j)
                         {
                             vector[j] = (double)formatter.Deserialize(gzip);
                         }
@@ -143,7 +146,21 @@ namespace Automation.GenerativeAI.Stores
                         store.attributes.Add(attribute);
                     }
 
-                    store.transformer = (IVectorTransformer)formatter.Deserialize(gzip);
+                    try
+                    {
+                        store.transformer = (IVectorTransformer)formatter.Deserialize(gzip);
+                    }
+                    catch (Exception)
+                    {
+                        if(nVectorLength == 1536)
+                        {
+                            store.transformer = new OpenAIEmbeddingTransformer();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                 }
             }
 
