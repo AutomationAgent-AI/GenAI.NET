@@ -446,7 +446,8 @@ Status of the operation
 
 ### **CreatePromptTool(String, String, String)**
 
-Creates a prompt tool and adds it to tools collection.
+Creates a prompt tool and adds it to tools collection. The input parameters to
+ execute this tool is same as the variables defined in the input template.
 
 ```csharp
 public static string CreatePromptTool(string name, string description, string template)
@@ -473,7 +474,8 @@ Status of the operation.
 ### **CreateQueryTool(String, String, String)**
 
 Creates a query tool and adds it to tools collection. The query tool makes use of
- registered language model to get response of the query.
+ registered language model to get response of the query. The input parameters to execute
+ this tool is same as the variables defined in the input template.
 
 ```csharp
 public static string CreateQueryTool(string name, string description, string template)
@@ -500,7 +502,9 @@ Status of the operation.
 ### **CreateToolsPipeline(String, String, List&lt;String&gt;)**
 
 Creates a pipeline with a list of tools. A pipeline executes tools sequentially, where
- output of previous tools can be input of the next tool in the sequence.
+ output of previous tools can be input of the next tool in the sequence. The input
+ parameter to execute this tool is same as the input parameter of the first tool in
+ the pipeline.
 
 ```csharp
 public static string CreateToolsPipeline(string name, string description, List<string> tools)
@@ -527,7 +531,8 @@ Status of the operation.
 Creates MapReduce tool which can take a mapper tool to map the input collection to
  an intermediate data using mapper tool and then reduce the intermediate data to the final
  output using reducer tool. The mapper runs in parallel, hence mapper tool needs to ensure
- thread safety.
+ thread safety. The input parameter to execute this tool is the same as the input parameters
+ of the mapper tool, however, each parameter is of array type in this case.
 
 ```csharp
 public static string CreateMapReduceTool(string name, string description, string mapper, string reducer)
@@ -554,7 +559,8 @@ Status of the operation.
 
 ### **CreateCombineTool(String, String)**
 
-Creates a combine tool to combine an array of string using newline.
+Creates a combine tool to combine an array of string using newline. The input parameter
+ name to execute this tool is 'input'
 
 ```csharp
 public static string CreateCombineTool(string name, string description)
@@ -575,7 +581,8 @@ Status of the operation.
 
 ### **CreateBingSearchTool(String, String, String, Int32)**
 
-Creates a bing search tool to search specific query.
+Creates a bing search tool to search specific query. The input parameter name to
+ execute this tool is 'query'.
 
 ```csharp
 public static string CreateBingSearchTool(string name, string description, string apikey, int maxResultsCount)
@@ -602,7 +609,8 @@ Status of the operation.
 
 ### **CreateSemanticSearchTool(String, String, String, Int32)**
 
-Creates a search tool for semantic search using a given vector database
+Creates a search tool for semantic search using a given vector database. The input parameter
+ name to execute this tool is 'query'.
 
 ```csharp
 public static string CreateSemanticSearchTool(string name, string description, string dbpath, int maxResultsCount)
@@ -630,7 +638,9 @@ Status of the operation.
 
 ### **CreateHttpRequestTool(String, String, String)**
 
-Creates HttpTool that can be used to make GET/POST/PUT/DELETE requests to any uri.
+Creates HttpTool that can be used to make GET/POST/PUT/DELETE requests to any uri. The input
+ parameters to execute this tool are 'uri', 'method', and 'body'. 'method' should be one of the
+ method type GET, POST, PUT, or DELETE.
 
 ```csharp
 public static string CreateHttpRequestTool(string name, string description, string requestHeaderJson)
@@ -655,7 +665,8 @@ Status of the operation
 ### **CreateTextExtractorTool(String, String)**
 
 Creates a text extractor tool that extracts text from different files. Currently
- txt, csv and pdf files are supported.
+ txt, csv and pdf files are supported. The input parameter to execute this tool
+ is 'input'.
 
 ```csharp
 public static string CreateTextExtractorTool(string name, string description)
@@ -676,7 +687,8 @@ Status of the operation
 
 ### **CreateDataExtractorTool(String, String, String)**
 
-Creates a tool that can extract data from an unstructured text using language model.
+Creates a tool that can extract data from an unstructured text using language model. The input
+ parameter name to execute this tool is 'input'.
 
 ```csharp
 public static string CreateDataExtractorTool(string name, string description, string parametersJson)
@@ -701,7 +713,8 @@ Status of the operation
 
 ### **CreateSummarizerTool(String, String, String, String)**
 
-Creates a text summarizer tool with map reduce strategy.
+Creates a text summarizer tool with map reduce strategy. The input parameter to
+ execute this tool is input.
 
 ```csharp
 public static string CreateSummarizerTool(string name, string description, string mapperPrompt, string reducerPrompt)
