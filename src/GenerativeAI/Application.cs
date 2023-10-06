@@ -110,7 +110,7 @@ namespace Automation.GenerativeAI
         /// <param name="apikey">apikey for the language model</param>
         /// <param name="logFilePath">Full path for log files.</param>
         /// <exception cref="NotImplementedException"></exception>
-        public void Initialize(string llmtype, string model, string apikey, string logFilePath)
+        public static void Initialize(string llmtype, string model, string apikey, string logFilePath)
         {
             Logger.SetLogFile(logFilePath);
             var svc = GetAIService();
@@ -191,6 +191,10 @@ namespace Automation.GenerativeAI
             else if (Directory.Exists(source))
             {
                 files = Directory.GetFiles(source);
+            }
+            else if (File.Exists(source))
+            {
+                files = Enumerable.Repeat(source, 1);
             }
             else
             {
