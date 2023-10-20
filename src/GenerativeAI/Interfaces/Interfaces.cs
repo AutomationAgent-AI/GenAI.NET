@@ -102,6 +102,43 @@ namespace Automation.GenerativeAI.Interfaces
     }
 
     /// <summary>
+    /// Represents long term memory store for the language model
+    /// </summary>
+    public interface IMemoryStore
+    {
+        /// <summary>
+        /// Configures the memory store
+        /// </summary>
+        /// <param name="maxCharacters">Max characters allowed for chat history</param>
+        /// <param name="vectorStore">Vector store to be used for semantic search</param>
+        void Configure(int maxCharacters, IVectorStore vectorStore);
+
+        /// <summary>
+        /// Gets the current chat history
+        /// </summary>
+        /// <param name="query">Current query to get relevant history.</param>
+        /// <returns></returns>
+        IEnumerable<ChatMessage> ChatHistory(string query);
+
+        /// <summary>
+        /// Adds a ChatMessage to the memory
+        /// </summary>
+        /// <param name="message"></param>
+        void AddMessage(ChatMessage message);
+
+        /// <summary>
+        /// Clears the memory
+        /// </summary>
+        void Clear();
+
+        /// <summary>
+        /// Saves the memory to a given file path
+        /// </summary>
+        /// <param name="filepath"></param>
+        void Save(string filepath);
+    }
+
+    /// <summary>
     /// Represents a vector store to store embedding vectors along with its attributes.
     /// </summary>
     public interface IVectorStore

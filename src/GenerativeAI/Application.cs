@@ -3,6 +3,7 @@ using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Services;
+using Automation.GenerativeAI.Stores;
 using Automation.GenerativeAI.Tools;
 using Automation.GenerativeAI.Utilities;
 using System;
@@ -44,12 +45,14 @@ namespace Automation.GenerativeAI
         private static ILanguageModel languageModel;
         private static ToolsCollection toolsCollection = new ToolsCollection();
         private static ExecutionContext exeResults = new ExecutionContext();
+        private static Dictionary<string, IMemoryStore> memories = new Dictionary<string, IMemoryStore>();
         private static Dictionary<string, Agent> agents = new Dictionary<string, Agent>();
         
         internal static void Reset()
         {
             toolsCollection = new ToolsCollection();
             agents.Clear();
+            memories.Clear();
         }
 
         private static ILanguageModel LanguageModel
@@ -438,6 +441,68 @@ namespace Automation.GenerativeAI
             exeResults = new ExecutionContext(ctx);
 
             return tool.ExecuteAsync(exeResults).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Executes a given tool with the arguments passed and returns the 
+        /// output as a string. For complex objects it returns JSON string.
+        /// </summary>
+        /// <param name="sessionName">Name of the session to access memory store</param>
+        /// <param name="toolName">Name of the tool to execute</param>
+        /// <param name="executionContext">A JSON string with key value pairs as a context holding variable values to execute the tool.</param>
+        /// <returns>Output string as a result of the execution if successful, else error message starting with ERROR.</returns>
+        public static string ExecuteTool(string sessionName, string toolName, string executionContext)
+        {
+            var tool = toolsCollection.GetTool(toolName);
+            if (tool == null) return $"ERROR: A tool with name, '{toolName}' doesn't exists!!";
+
+            var ctx = FunctionTool.Deserialize<Dictionary<string, object>>(executionContext);
+            if (ctx == null) return $"ERROR: Invalid execution context!!";
+
+            IMemoryStore memory = null;
+            if(!memories.TryGetValue(sessionName, out memory))
+            {
+                memory = new MemoryStore();
+                memories.Add(sessionName, memory);
+            }
+            
+            //Create execution context with memory
+            exeResults = new ExecutionContext(ctx).WithMemory(memory);
+
+            return tool.ExecuteAsync(exeResults).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Restores a session with the given session file.
+        /// </summary>
+        /// <param name="sessionName">Name of the session</param>
+        /// <param name="sessionFilePath">Full path of the session file</param>
+        /// <returns>Status of the operation</returns>
+        public static string RestoreSession(string sessionName, string sessionFilePath) 
+        {
+            var memory = MemoryStore.FromJsonFile(sessionFilePath);
+            if (null == memory) return $"ERROR: Failed to restore session: {sessionName} with file: {sessionFilePath}";
+
+            memories[sessionName] = memory;
+            return "success";
+        }
+
+        /// <summary>
+        /// Saves a given session to a file.
+        /// </summary>
+        /// <param name="sessionName">Name of the session</param>
+        /// <param name="sessionFilePath">Full path of the session file to save the session.</param>
+        /// <returns>Status of the operation</returns>
+        public static string SaveSession(string sessionName, string sessionFilePath)
+        {
+            IMemoryStore memory = null;
+            if(!memories.TryGetValue(sessionName, out memory))
+            {
+                return $"ERROR: Session not found: {sessionName}";
+            }
+
+            memory.Save(sessionFilePath);
+            return "success";
         }
 
         /// <summary>

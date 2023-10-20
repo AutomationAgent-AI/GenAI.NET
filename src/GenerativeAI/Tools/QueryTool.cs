@@ -1,6 +1,5 @@
 ﻿using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Automation.GenerativeAI.Tools
@@ -95,9 +94,18 @@ namespace Automation.GenerativeAI.Tools
             var msg = prompt.FormatMessage(context);
             if (msg != null)
             {
-                var response = await LanguageModel.GetResponseAsync(Enumerable.Repeat(msg, 1), temperature);
+                context.MemoryStore.AddMessage(msg);
+                var history = context.MemoryStore.ChatHistory(msg.content);
+                
+                var response = await LanguageModel.GetResponseAsync(history, temperature);
+                
                 result.output = response.Response;
                 result.success = response.Type == ResponseType.Done;
+                if(response.Type != ResponseType.Failed)
+                {
+                    msg = new ChatMessage(Role.assistant, response.Response);
+                    context.MemoryStore.AddMessage(msg); 
+                }
             }
 
             return result;

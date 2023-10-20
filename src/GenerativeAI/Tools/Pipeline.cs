@@ -130,7 +130,8 @@ namespace Automation.GenerativeAI.Tools
         {
             if (string.IsNullOrEmpty(previousResult)) return context;
 
-            var newContext = new ExecutionContext();
+            var newContext = new ExecutionContext(context.MemoryStore);
+            
             var parameters = tool.Descriptor.Parameters.Properties;
             foreach (var parameter in parameters)
             {

@@ -1,0 +1,79 @@
+{
+  "history": [
+    {
+      "role": "user",
+      "content": "Hi, there!! I am Ram"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello Ram! How can I assist you today?"
+    },
+    {
+      "role": "user",
+      "content": "What is my name and which fruit do I like?"
+    },
+    {
+      "role": "assistant",
+      "content": "Your name is Romeo and you like to eat apples for breakfast."
+    },
+    {
+      "role": "user",
+      "content": "What do I do for living?"
+    },
+    {
+      "role": "assistant",
+      "content": "You work as a Software Engineer."
+    },
+    {
+      "role": "user",
+      "content": "Where is Timbaktu?"
+    },
+    {
+      "role": "assistant",
+      "content": "Timbaktu is a village located in the Anantapur district of the state of Andhra Pradesh in southern India."
+    },
+    {
+      "role": "user",
+      "content": "I live in Kolkata, Which Indian State do I live in?"
+    },
+    {
+      "role": "assistant",
+      "content": "You live in the Indian state of West Bengal, with Kolkata being its capital city."
+    },
+    {
+      "role": "user",
+      "content": "What is my name?"
+    },
+    {
+      "role": "assistant",
+      "content": "Your name is Romeo."
+    },
+    {
+      "role": "user",
+      "content": "What is the capital of the state I live in?"
+    },
+    {
+      "role": "assistant",
+      "content": "The capital of the state you live in is Kolkata."
+    },
+    {
+      "role": "user",
+      "content": "What is the revenue of Meta in Q1 of 2023?"
+    },
+    {
+      "role": "assistant",
+      "content": "The revenue of Meta in Q1 of 2023 was $28.6 billion."
+    },
+    {
+      "role": "user",
+      "content": "Provide me trend on revenue growth, expenses, share price and other financial data for Meta"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"revenue_growth_trend\": \"positive\"}"
+    }
+  ],
+  "maxCharacters": 150,
+  "vectorStorePath": "",
+  "SemanticSearch": true
+}

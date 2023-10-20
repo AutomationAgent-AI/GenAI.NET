@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Timers;
@@ -128,7 +129,9 @@ namespace Automation.GenerativeAI.Utilities
         public FileLogger(string logFile) 
         { 
             LogFile = logFile;
-            Timer = new Timer(2000);
+            var interval = Debugger.IsAttached ? 20000 : 2000;
+            
+            Timer = new Timer(interval);
             Timer.Elapsed += OnTimer;
             Timer.Enabled = true;
             Timer.AutoReset = true;

@@ -71,6 +71,7 @@
     <Compile Include="Interfaces\TextObject.cs" />
     <Compile Include="LLM\MockLanguageModel.cs" />
     <Compile Include="Services\PDFTextProvider.cs" />
+    <Compile Include="Stores\MemoryStore.cs" />
     <Compile Include="Tools\BingSearch.cs" />
     <Compile Include="Tools\CombineTool.cs" />
     <Compile Include="Tools\DataExtractorTool.cs" />
