@@ -288,7 +288,6 @@ namespace Automation.GenerativeAI.Agents
 
     internal class FunctionAgent : Agent
     {
-        private List<ChatMessage> messages = new List<ChatMessage>();
         public FunctionAgent()
         {
 
@@ -302,7 +301,8 @@ namespace Automation.GenerativeAI.Agents
                 functions = Tools.GetFunctions();
             }
 
-            LLMResponse response = await LanguageModel.GetResponseAsync(messages, functions, Temperature);
+            var history = memoryStore.ChatHistory("").ToList();
+            LLMResponse response = await LanguageModel.GetResponseAsync(history, functions, Temperature);
             if (response.Type == ResponseType.Failed)
             {
                 return new FinishAction(string.Empty, response.Response);
@@ -332,10 +332,10 @@ namespace Automation.GenerativeAI.Agents
 
         private async Task<AgentAction> ObsoleteExecuteAsync(string objective)
         {
-            if(messages.Count == 0)
+            if(!memoryStore.ChatHistory("").Any())
             {
-                messages.Add(new ChatMessage(Role.system, SystemPrompt));
-                messages.Add(new ChatMessage(Role.user, objective));
+                memoryStore.AddMessage(new ChatMessage(Role.system, SystemPrompt));
+                memoryStore.AddMessage(new ChatMessage(Role.user, objective));
             }
 
             var functions = Enumerable.Empty<FunctionDescriptor>();
@@ -347,12 +347,13 @@ namespace Automation.GenerativeAI.Agents
             LLMResponse response = new LLMResponse() { Type = ResponseType.Failed };
             while (response.Type != ResponseType.Done)
             {
-                response = await LanguageModel.GetResponseAsync(messages, functions, Temperature);
+                var history = memoryStore.ChatHistory("");
+                response = await LanguageModel.GetResponseAsync(history, functions, Temperature);
                 //When there is no tool registered then one call is good
                 if (response.Type == ResponseType.Failed) return new FinishAction(string.Empty, response.Response);
 
                 var msg = MessgeFromResponse(response);
-                messages.Add(msg);
+                memoryStore.AddMessage(msg);
 
                 if (Tools != null && response.Type == ResponseType.FunctionCall)
                 {
@@ -369,12 +370,12 @@ namespace Automation.GenerativeAI.Agents
 
                     if (string.IsNullOrEmpty(output))
                     {
-                        messages.Add(fmsg);
+                        memoryStore.AddMessage(fmsg);
                         var tool = Tools.GetTool((string)function);
                         return new AgentAction(tool, new ExecutionContext(arguments), $"Need to execute {tool.Name}");
                     }
 
-                    messages.Add(new FunctionMessage((string)function, output));
+                    memoryStore.AddMessage(new FunctionMessage((string)function, output));
                 }
             }
             if (response.Type == ResponseType.Done)

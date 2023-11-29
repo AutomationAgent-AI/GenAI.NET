@@ -1,4 +1,5 @@
-﻿using Automation.GenerativeAI.Interfaces;
+﻿using Automation.GenerativeAI;
+using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

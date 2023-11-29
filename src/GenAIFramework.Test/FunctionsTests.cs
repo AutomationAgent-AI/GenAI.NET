@@ -54,7 +54,7 @@ namespace GenAIFramework.Test
         {
             Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: FunctionSerialization");
             var function = CreateSampleFunction();
-            var json = OpenAILanguageModel.ToJSON(Enumerable.Repeat(function, 1));
+            var json = OpenAIClient.ToJSON(Enumerable.Repeat(function, 1));
             Assert.IsNotNull(json);
             var expected = "[{\"name\":\"get_current_weather\",\"description\":\"Get the current weather in a given location\",\"parameters\":{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"The city and state, e.g. San Francisco, CA\"},\"unit\":{\"type\":\"string\",\"enum\":[\"celsius\",\"fahrenheit\"],\"description\":\"\"}},\"required\":[\"location\"]}}]";
             Assert.AreEqual(expected, json);

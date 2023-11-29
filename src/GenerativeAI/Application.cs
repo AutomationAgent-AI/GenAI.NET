@@ -71,7 +71,7 @@ namespace Automation.GenerativeAI
         /// <summary>
         /// Provides an instance of the default OpenAI language model
         /// </summary>
-        public static ILanguageModel DefaultLanguageModel => new OpenAILanguageModel("gpt-3.5-turbo");
+        public static ILanguageModel DefaultLanguageModel => new OpenAIClient(Configuration.Instance.OpenAIConfig);
 
         //To be used for testing
         internal static void SetLanguageModel(ILanguageModel llm)
@@ -120,12 +120,38 @@ namespace Automation.GenerativeAI
             switch (llmtype.ToLower())
             {
                 case "openai":
-                    Environment.SetEnvironmentVariable("OPENAI_API_KEY", apikey);
+                    Configuration.Instance.OpenAIConfig = new OpenAIConfig() { ApiKey = apikey };
                     languageModel = svc.CreateOpenAIModel(model, apikey);
                     break;
                 default:
                     throw new NotImplementedException(llmtype);
             }
+        }
+
+        /// <summary>
+        /// Initializes AzureOpenAI language model. Application must be initialized before making any request.
+        /// </summary>
+        /// <param name="azureEndpoint">Endpoint URL for Azure OpenAI service</param>
+        /// <param name="gptDeployment">Deployment Name for GPT model</param>
+        /// <param name="embeddingDeployment">Deployment Name for text embedding model</param>
+        /// <param name="apiversion">API version</param>
+        /// <param name="apiKey">ApiKey for the language model</param>
+        /// <param name="model">Model name to be used for chat completion</param>
+        /// <param name="logFilePath">Full path for log file.</param>
+        public static void InitializeAzureOpenAI(string azureEndpoint, string gptDeployment, string embeddingDeployment, string apiversion, string apiKey, string model, string logFilePath)
+        {
+            Configuration.Instance.OpenAIConfig = new OpenAIConfig()
+            {
+                EndPointUrl = azureEndpoint,
+                GPTDeployment = gptDeployment,
+                EmbeddingDeployment = embeddingDeployment,
+                ApiVersion = apiversion,
+                ApiKey = apiKey,
+                Model = model
+            };
+            Configuration.Instance.LogFile = logFilePath;
+            Logger.SetLogFile(logFilePath);
+            languageModel = new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig);
         }
 
         /// <summary>

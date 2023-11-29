@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Automation.GenerativeAI.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -188,6 +189,7 @@ namespace Automation.GenerativeAI.Tools
             {
                 using (var response = await this.httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false))
                 {
+                    Logger.WriteLog(LogLevel.Info, LogOps.Command, $"HttpTool.SendRequest, {uri}, status: {response.StatusCode}");
                     response.EnsureSuccessStatusCode();
                     return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 }

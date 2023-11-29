@@ -68,7 +68,7 @@ QUESTION:
         {
             if(store == null)
             {
-                store = new VectorStore(new OpenAIEmbeddingTransformer());
+                store = new VectorStore(languageModel.VectorTransformer);
             }
 
             store.Add(context, true);

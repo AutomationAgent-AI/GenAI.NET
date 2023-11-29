@@ -58,7 +58,20 @@ namespace Automation.GenerativeAI.Services
 
         public ILanguageModel CreateOpenAIModel(string model, string apikey)
         {
+            if (!string.IsNullOrEmpty(apikey))
+            {
+                Configuration.Instance.OpenAIConfig = new OpenAIConfig() { ApiKey = apikey, Model = model };
+            }
             return new OpenAILanguageModel(model, apikey);
+        }
+
+        public ILanguageModel CreateAzureOpenAIModel(string model, string azureEndpoint, string gptDeployment, string embeddingDeployment, string apiversion, string apikey)
+        {
+            if (!string.IsNullOrEmpty(apikey))
+            {
+                Configuration.Instance.OpenAIConfig = new OpenAIConfig() { EndPointUrl = azureEndpoint, GPTDeployment = gptDeployment, EmbeddingDeployment = embeddingDeployment, ApiVersion = apiversion, ApiKey = apikey, Model = model };
+            }
+            return new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig);
         }
     }
 }

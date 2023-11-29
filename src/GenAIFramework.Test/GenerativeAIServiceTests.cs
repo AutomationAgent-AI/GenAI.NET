@@ -1,4 +1,5 @@
-﻿using Automation.GenerativeAI.Interfaces;
+﻿using Automation.GenerativeAI;
+using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Stores;
 using Automation.GenerativeAI.Tools;
@@ -25,6 +26,7 @@ namespace GenAIFramework.Test
         {
             //return new OpenAILanguageModel("gpt-3.5-turbo");
             return new MockLanguageModel("Mock", responses);
+            //return new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig); 
         }
 
         public GenerativeAIServiceTests() : base("GenerativeAIServiceTests")

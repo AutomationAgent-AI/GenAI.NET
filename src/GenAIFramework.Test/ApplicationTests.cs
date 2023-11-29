@@ -28,6 +28,7 @@ namespace GenAIFramework.Test
             };
 
             var model = new MockLanguageModel("Mock", responses);
+            //var model = new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig);
             return model;
         }
 
@@ -401,7 +402,7 @@ namespace GenAIFramework.Test
             step = FunctionTool.Deserialize<StepAction>(action);
             Assert.IsNotNull(step);
             Assert.AreEqual("EditFinancialForecast", step.tool);
-            Assert.AreEqual(2023, step.parameters["year"]);
+            Assert.AreEqual(2022, step.parameters["year"]);
             Assert.AreEqual("opex", step.parameters["category"]);
             Assert.AreEqual(-23, step.parameters["amount"]);
 

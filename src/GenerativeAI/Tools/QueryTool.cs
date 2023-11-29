@@ -1,5 +1,6 @@
 ﻿using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Automation.GenerativeAI.Tools
@@ -95,7 +96,7 @@ namespace Automation.GenerativeAI.Tools
             if (msg != null)
             {
                 context.MemoryStore.AddMessage(msg);
-                var history = context.MemoryStore.ChatHistory(msg.content);
+                var history = context.MemoryStore.ChatHistory(msg.content).ToList();
                 
                 var response = await LanguageModel.GetResponseAsync(history, temperature);
                 

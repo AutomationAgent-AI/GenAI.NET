@@ -15,7 +15,7 @@ namespace Automation.GenerativeAI.Stores
     {
         private IVectorStore store = null;
         private readonly List<ChatMessage> history = new List<ChatMessage>();
-        private int maxCharacters = 1000;
+        private int maxCharacters = 15000;
         
         class Data
         {
@@ -73,8 +73,15 @@ namespace Automation.GenerativeAI.Stores
                 }
                 return messages.OrderBy(p => p.Key).Select(p => p.Value);
             }
-            
-            return history.Select(x => x).Reverse().TakeWhile(m => (len += m.content.Length) < maxCharacters).Reverse();
+
+            return history.Select(x => x).Reverse().TakeWhile(m => (len += GetMessageLength(m)) < maxCharacters).Reverse().ToList();
+        }
+
+        private static int GetMessageLength(ChatMessage message)
+        {
+            if(message == null) return 0;
+            if(message.content !=null) return message.content.Length;
+            return 0;
         }
 
         /// <summary>
