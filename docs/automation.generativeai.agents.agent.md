@@ -128,18 +128,31 @@ Maximum number of steps that can be executed.
 [Agent](./automation.generativeai.agents.agent.md)<br>
 This Agent
 
-### **GetNextActionAsync(List&lt;ChatMessage&gt;)**
+### **WithMemoryStore(IMemoryStore)**
 
-Provides a next agent action based on the given message history.
+Sets the memory store for the agent
 
 ```csharp
-protected abstract Task<AgentAction> GetNextActionAsync(List<ChatMessage> messages)
+public Agent WithMemoryStore(IMemoryStore memory)
 ```
 
 #### Parameters
 
-`messages` [List&lt;ChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1)<br>
-History of messages as a list
+`memory` [IMemoryStore](./automation.generativeai.interfaces.imemorystore.md)<br>
+External memory store
+
+#### Returns
+
+[Agent](./automation.generativeai.agents.agent.md)<br>
+This Agent
+
+### **GetNextActionAsync()**
+
+Provides a next agent action based on the given message history.
+
+```csharp
+protected abstract Task<AgentAction> GetNextActionAsync()
+```
 
 #### Returns
 

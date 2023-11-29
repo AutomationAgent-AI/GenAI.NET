@@ -128,7 +128,10 @@ namespace Automation.GenerativeAI.Tools
 
         private ExecutionContext GetExecutionContext(IFunctionTool tool, ExecutionContext context, string previousResult)
         {
-            var newContext = new ExecutionContext();
+            if (string.IsNullOrEmpty(previousResult)) return context;
+
+            var newContext = new ExecutionContext(context.MemoryStore);
+            
             var parameters = tool.Descriptor.Parameters.Properties;
             foreach (var parameter in parameters)
             {
@@ -137,9 +140,9 @@ namespace Automation.GenerativeAI.Tools
                     var name = parameter.Name.Substring(6);
                     newContext[parameter.Name] = context[name];
                 }
-                else if(context.TryGetValue(parameter.Name, out var value)) 
+                else if(parameter.Name.StartsWith("Result.")) 
                 {
-                    newContext[parameter.Name] = value;
+                    newContext[parameter.Name] = context[parameter.Name];
                 }
                 else
                 {

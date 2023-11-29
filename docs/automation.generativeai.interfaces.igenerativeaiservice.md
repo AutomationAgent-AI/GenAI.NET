@@ -30,6 +30,40 @@ API Key, if passed empty string then it will try to get the
 #### Returns
 
 [ILanguageModel](./automation.generativeai.interfaces.ilanguagemodel.md)<br>
+OpenAI Language Model instance
+
+### **CreateAzureOpenAIModel(String, String, String, String, String, String)**
+
+Creates an instance of Azure OpenAI Language Model
+
+```csharp
+ILanguageModel CreateAzureOpenAIModel(string model, string azureEndpoint, string gptDeployment, string embeddingDeployment, string apiversion, string apiKey)
+```
+
+#### Parameters
+
+`model` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Azure OpenAI model name
+
+`azureEndpoint` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Endpoint URL for Azure OpenAI service
+
+`gptDeployment` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Deployment Name for GPT model
+
+`embeddingDeployment` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Deployment Name for text embedding model
+
+`apiversion` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+API version
+
+`apiKey` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+ApiKey for the language model
+
+#### Returns
+
+[ILanguageModel](./automation.generativeai.interfaces.ilanguagemodel.md)<br>
+Azure OpenAI Language Model instance
 
 ### **CreateVectorStore(IVectorTransformer)**
 

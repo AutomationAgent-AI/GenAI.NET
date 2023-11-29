@@ -15,6 +15,11 @@ namespace Automation.GenerativeAI.Interfaces
         string ModelName { get; }
 
         /// <summary>
+        /// Gets vector transformer for semantic search
+        /// </summary>
+        IVectorTransformer VectorTransformer { get; }
+
+        /// <summary>
         /// Gets response based on given history of messages.
         /// </summary>
         /// <param name="messages">A list of messages as a history. The Response is generated for  
@@ -99,6 +104,43 @@ namespace Automation.GenerativeAI.Interfaces
         /// Text content
         /// </summary>
         string Text { get; }
+    }
+
+    /// <summary>
+    /// Represents long term memory store for the language model
+    /// </summary>
+    public interface IMemoryStore
+    {
+        /// <summary>
+        /// Configures the memory store
+        /// </summary>
+        /// <param name="maxCharacters">Max characters allowed for chat history</param>
+        /// <param name="vectorStore">Vector store to be used for semantic search</param>
+        void Configure(int maxCharacters, IVectorStore vectorStore);
+
+        /// <summary>
+        /// Gets the current chat history
+        /// </summary>
+        /// <param name="query">Current query to get relevant history.</param>
+        /// <returns></returns>
+        IEnumerable<ChatMessage> ChatHistory(string query);
+
+        /// <summary>
+        /// Adds a ChatMessage to the memory
+        /// </summary>
+        /// <param name="message"></param>
+        void AddMessage(ChatMessage message);
+
+        /// <summary>
+        /// Clears the memory
+        /// </summary>
+        void Clear();
+
+        /// <summary>
+        /// Saves the memory to a given file path
+        /// </summary>
+        /// <param name="filepath"></param>
+        void Save(string filepath);
     }
 
     /// <summary>
@@ -263,8 +305,7 @@ namespace Automation.GenerativeAI.Interfaces
     public enum TransformerType
     {
         /// <summary>
-        /// Uses text embedding using OpenAI API. The API key of OpenAI must be set as 'OPENAI_API_KEY'
-        /// Environment variable.
+        /// Uses text embedding using Azure/OpenAI API. 
         /// </summary>
         OpenAIEmbedding
     }
@@ -280,8 +321,20 @@ namespace Automation.GenerativeAI.Interfaces
         /// <param name="model">OpenAI model name</param>
         /// <param name="apikey">API Key, if passed empty string then it will try to get the
         /// the key using environment variable OPENAI_API_KEY.</param>
-        /// <returns></returns>
+        /// <returns>OpenAI Language Model instance</returns>
         ILanguageModel CreateOpenAIModel(string model, string apikey);
+
+        /// <summary>
+        /// Creates an instance of Azure OpenAI Language Model
+        /// </summary>
+        /// <param name="model">Azure OpenAI model name</param>
+        /// <param name="azureEndpoint">Endpoint URL for Azure OpenAI service</param>
+        /// <param name="gptDeployment">Deployment Name for GPT model</param>
+        /// <param name="embeddingDeployment">Deployment Name for text embedding model</param>
+        /// <param name="apiversion">API version</param>
+        /// <param name="apiKey">ApiKey for the language model</param>
+        /// <returns>Azure OpenAI Language Model instance</returns>
+        ILanguageModel CreateAzureOpenAIModel(string model, string azureEndpoint, string gptDeployment, string embeddingDeployment, string apiversion, string apiKey);
 
         /// <summary>
         /// Creates a new Vector store with a given transformer. A transformer transforms a text object

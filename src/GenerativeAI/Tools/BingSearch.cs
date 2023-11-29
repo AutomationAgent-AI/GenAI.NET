@@ -13,7 +13,7 @@ namespace Automation.GenerativeAI.Tools
         {
             if (string.IsNullOrEmpty(apiKey))
             {
-                apiKey = Environment.GetEnvironmentVariable("BING_API_KEY");
+                apiKey = Configuration.Instance.BingAPIConfig.ApiKey;
             }
 
             var headers = new Dictionary<string, string>()
@@ -46,7 +46,7 @@ namespace Automation.GenerativeAI.Tools
         /// <returns>List of search results</returns>
         public async override Task<IEnumerable<SearchResult>> SearchAsync(string query, string context)
         {
-            string uri = $"https://api.bing.microsoft.com/v7.0/search?q={Uri.EscapeDataString(query)}&count={count+1}&offset=0";
+            string uri = $"{Configuration.Instance.BingAPIConfig.EndPointUrl}search?q={Uri.EscapeDataString(query)}&count={count+1}&offset=0";
 
             var json = await httpTool.GetAsync(uri);
             var data = Deserialize<BingSearchResult>(json);

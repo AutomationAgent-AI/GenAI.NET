@@ -1,29 +1,41 @@
-﻿using Automation.GenerativeAI.Interfaces;
+﻿using Automation.GenerativeAI;
+using Automation.GenerativeAI.Interfaces;
 using Automation.GenerativeAI.LLM;
+using Automation.GenerativeAI.Stores;
+using Automation.GenerativeAI.Tools;
 using Automation.GenerativeAI.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 using GenerativeApp = Automation.GenerativeAI.Application;
 
 namespace GenAIFramework.Test
 {
     [TestClass]
-    public class GenerativeAIServiceTests
+    public class GenerativeAIServiceTests : TestBase
     {
-        private string RootPath = string.Empty;
-        private ILanguageModel languageModel;
+        private readonly Dictionary<string, string> responses;
 
-        public GenerativeAIServiceTests()
+        protected override ILanguageModel CreateLanguageModel()
+        {
+            //return new OpenAILanguageModel("gpt-3.5-turbo");
+            return new MockLanguageModel("Mock", responses);
+            //return new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig); 
+        }
+
+        public GenerativeAIServiceTests() : base("GenerativeAIServiceTests")
         {
             RootPath = Assembly.GetExecutingAssembly().Location;
             var logfile = Path.Combine(RootPath, @"..\..\..\..\..\tests\output\GenerativeAIServiceTests.log");
             Logger.SetLogFile(logfile);
 
-            var responses = new Dictionary<string, string>()
+            responses = new Dictionary<string, string>()
             {
                 { "Hi, there!! I am Ram", "Hello Ram! How can I assist you today?"},
                 { "What is my name and which fruit do I like?", "Your name is Romeo and you like to eat apples for breakfast."},
@@ -33,12 +45,21 @@ namespace GenAIFramework.Test
                 { "What is my name?", "Your name is Romeo." },
                 { "What is the capital of the state I live in?", "The capital of the state you live in is Kolkata." },
                 { "What is the revenue of Meta in Q1 of 2023?", "The revenue of Meta in Q1 of 2023 was $28.6 billion." },
-                { "Provide me trend on revenue growth, expenses, share price and other financial data for Meta", "{\"revenue_grow_trend\": \"positive\"}" }
+                { "Provide me trend on revenue growth, expenses, share price and other financial data for Meta", "{\"revenue_growth_trend\": \"positive\"}" }
             };
+        }
 
-            languageModel = new MockLanguageModel("Mock", responses);
-            //languageModel = new OpenAILanguageModel("gpt-3.5-turbo");
-            GenerativeApp.SetLanguageModel(languageModel);
+        [TestInitialize]
+        public void Setup()
+        {
+            GenerativeApp.SetLanguageModel(LanguageModel);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            GenerativeApp.Reset();
+            Utilities.Reset();
         }
 
         [TestMethod]
@@ -135,7 +156,7 @@ namespace GenAIFramework.Test
             var service = GenerativeApp.GetAIService();
             Assert.IsNotNull(service);
 
-            var chat = service.CreateConversation("hello", languageModel);
+            var chat = service.CreateConversation("hello", LanguageModel);
             Assert.IsNotNull(chat);
             Assert.AreEqual("hello", chat.Id);
 
@@ -153,7 +174,7 @@ namespace GenAIFramework.Test
             var service = GenerativeApp.GetAIService();
             Assert.IsNotNull(service);
 
-            var chat = service.CreateConversation("context", languageModel);
+            var chat = service.CreateConversation("context", LanguageModel);
 
             chat.AppendMessage("What is my name and which fruit do I like?", Role.user);
 
@@ -252,6 +273,170 @@ namespace GenAIFramework.Test
             Assert.IsNotNull(response);
             Assert.IsTrue(response.Contains("positive"));
             Assert.IsTrue(response.Contains("{") && response.Contains("}")); //check for JSON format.
+        }
+
+        [TestMethod]
+        public void CreateMemoryStoreWithMaxCharacter()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: CreateMemoryStoreWithMaxCharacter");
+            var memory = new MemoryStore();
+            memory.Configure(150, null);
+
+            foreach (var item in responses) 
+            {
+                memory.AddMessage(new ChatMessage(Role.user, item.Key));
+                memory.AddMessage(new ChatMessage(Role.assistant, item.Value));
+            }
+
+            var history = memory.ChatHistory("").ToList();
+            Assert.AreEqual(2, history.Count);
+            Assert.IsTrue(history[0].content.Contains("revenue growth"));
+            Assert.IsTrue(history[1].content.Contains("revenue_growth_trend"));
+        }
+
+        [TestMethod]
+        public void CreateMemoryStoreWithSemanticSearch()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: CreateMemoryStoreWithSemanticSearch");
+            var vectorStore = new VectorStore(new OpenAIEmbeddingTransformer());
+            var memory = new MemoryStore();
+            memory.Configure(150, vectorStore);
+
+            foreach (var item in responses)
+            {
+                memory.AddMessage(new ChatMessage(Role.user, item.Key));
+                memory.AddMessage(new ChatMessage(Role.assistant, item.Value));
+            }
+
+            var history = memory.ChatHistory("Which fruit do I like?").ToList();
+            Assert.AreEqual(4, history.Count);
+            Assert.IsTrue(history[0].content.Contains("fruit"));
+            Assert.IsTrue(history[1].content.Contains("apples"));
+        }
+
+        [TestMethod]
+        public void SerializeMemoryStoreWithoutSemanticSearch()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: SerializeMemoryStoreWithoutSemanticSearch");
+            var memory = new MemoryStore();
+            memory.Configure(150, null);
+
+            foreach (var item in responses)
+            {
+                memory.AddMessage(new ChatMessage(Role.user, item.Key));
+                memory.AddMessage(new ChatMessage(Role.assistant, item.Value));
+            }
+
+            var output = Path.Combine(RootPath, "..\\..\\..\\..\\..\\tests\\output\\memory.json");
+            memory.Save(output);
+            Assert.IsTrue(File.Exists(output));
+
+            var mem = MemoryStore.FromJsonFile(output);
+            Assert.IsNotNull(mem);
+            mem.Configure(100000, null);
+            var history = mem.ChatHistory("").ToList();
+            Assert.AreEqual(18, history.Count);
+            Assert.AreEqual(history[0].content, responses.Keys.First());
+        }
+
+        [TestMethod]
+        public void DeserializeMemoryStoreWithSemanticSearchWithoutVDB()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: DeserializeMemoryStoreWithSemanticSearchWithoutVDB");
+            var input = Path.Combine(RootPath, "..\\..\\..\\..\\..\\tests\\input\\memory.json");
+            var memory = MemoryStore.FromJsonFile(input);
+            Assert.IsNotNull(memory);
+
+            var history = memory.ChatHistory("Which fruit do I like?").ToList();
+            Assert.AreEqual(4, history.Count);
+            Assert.IsTrue(history[0].content.Contains("fruit"));
+            Assert.IsTrue(history[1].content.Contains("apples"));
+        }
+
+        [TestMethod]
+        public async Task QueryToolWithMemory()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: QueryToolWithMemory");
+            var memory = new MemoryStore();
+            
+            var tool = QueryTool.WithPromptTemplate("{{$query}}").WithLanguageModel(LanguageModel);
+            var context = new ExecutionContext();
+            context.WithMemory(memory);
+            context["query"] = "Hi, My name is Romeo. I live in Kolkata. I work as a Software Engineer. I love to eat apple for breakfast. Which Indian State do I live in?";
+
+            var response = await tool.ExecuteAsync(context);
+            Assert.IsNotNull(response);
+            Assert.IsTrue(response.Contains("West Bengal"));
+
+            context["query"] = "What is my name?";
+            response = await tool.ExecuteAsync(context);
+            Assert.IsNotNull(response);
+            Assert.IsTrue(response.Contains("Romeo"));
+
+            Assert.IsNotNull(context.MemoryStore);
+            var history = context.MemoryStore.ChatHistory("").ToList();
+
+            Assert.AreEqual(4, history.Count);
+        }
+
+        [TestMethod]
+        public void AppCreateQueryToolWithMemory()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: AppCreateQueryToolWithMemory");
+
+            var tool = "Query";
+            var session = "QuerySession";
+            GenerativeApp.CreateQueryTool(tool, "Simple tool", "{{$query}}");
+            var context = "{\"query\":\"Hi, My name is Romeo.I live in Kolkata.I work as a Software Engineer. I love to eat apple for breakfast.Which Indian State do I live in?\"}";
+            var response = GenerativeApp.ExecuteTool(session, tool, context);
+            Assert.IsNotNull(response);
+            Assert.IsTrue(response.Contains("West Bengal"));
+
+            context = "{\"query\":\"What is my name?\"}";
+            response = GenerativeApp.ExecuteTool(session, tool, context);
+            Assert.IsNotNull(response);
+            Assert.IsTrue(response.Contains("Romeo"));
+
+            var output = Path.Combine(RootPath, "..\\..\\..\\..\\..\\tests\\output\\query.json");
+            var status = GenerativeApp.SaveSession(session, output);
+            Assert.AreEqual("success", status);
+            Assert.IsTrue(File.Exists(output));
+
+            var memory = MemoryStore.FromJsonFile(output);
+            Assert.IsNotNull(memory);
+
+            var history = memory.ChatHistory("").ToList();
+            Assert.AreEqual(4, history.Count);
+        }
+
+        [TestMethod]
+        public void AppRestoreMemoryForQueryTool()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Command, "Test: AppCreateQueryToolWithMemory");
+
+            var tool = "Query";
+            var session = "QuerySession";
+            var status = GenerativeApp.CreateQueryTool(tool, "Simple tool", "{{$query}}");
+            Assert.AreEqual("success", status);
+
+            var memory = new MemoryStore();
+            var msg = "Hi, My name is Romeo.I live in Kolkata.I work as a Software Engineer. I love to eat apple for breakfast.Which Indian State do I live in?";
+            memory.AddMessage(new ChatMessage(Role.user, msg));
+
+            var response = "You live in the Indian state of West Bengal, with Kolkata being its capital city.";
+            memory.AddMessage(new ChatMessage(Role.assistant, response));
+
+            var output = Path.Combine(RootPath, "..\\..\\..\\..\\..\\tests\\output\\temp.json");
+            memory.Save(output);
+            Assert.IsTrue(File.Exists(output));
+
+            status = GenerativeApp.RestoreSession(session, output);
+            Assert.AreEqual("success", status);
+
+            var context = "{\"query\":\"What is my name?\"}";
+            response = GenerativeApp.ExecuteTool(session, tool, context);
+            Assert.IsNotNull(response);
+            Assert.IsTrue(response.Contains("Romeo"));
         }
     }
 }

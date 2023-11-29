@@ -30,7 +30,7 @@ public string name { get; set; }
 Role of the messenger
 
 ```csharp
-public string role { get; }
+public string role { get; set; }
 ```
 
 #### Property Value

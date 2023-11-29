@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Automation.GenerativeAI.Stores;
+using System.Collections.Generic;
 
 namespace Automation.GenerativeAI.Interfaces
 {
@@ -7,7 +8,15 @@ namespace Automation.GenerativeAI.Interfaces
     /// </summary>
     public class ExecutionContext
     {
+        /// <summary>
+        /// Parameters dictionary
+        /// </summary>
         private Dictionary<string, object> parameters = null;
+
+        /// <summary>
+        /// Memory
+        /// </summary>
+        private IMemoryStore memoryStore = new MemoryStore(); //default store
 
         internal IDictionary<string, object> GetParameters() { return parameters; }
 
@@ -27,6 +36,40 @@ namespace Automation.GenerativeAI.Interfaces
         {
             this.parameters = parameters;
         }
+
+        /// <summary>
+        /// Creates ExecutionContext with memory and parameters
+        /// </summary>
+        /// <param name="memoryStore">Memory</param>
+        /// <param name="parameters">Parameters dictionary</param>
+        public ExecutionContext(IMemoryStore memoryStore, Dictionary<string, object> parameters = null)
+        {
+            if(parameters == null)
+            {
+                this.parameters = new Dictionary<string, object>();
+            }
+            else
+            {
+                this.parameters = parameters;
+            }
+            this.memoryStore = memoryStore;
+        }
+
+        /// <summary>
+        /// Sets the memory store
+        /// </summary>
+        /// <param name="memory">Memory</param>
+        /// <returns>Updated ExecutionContext</returns>
+        public ExecutionContext WithMemory(IMemoryStore memory)
+        {
+            memoryStore = memory;
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the memory store for the context
+        /// </summary>
+        public IMemoryStore MemoryStore => memoryStore;
 
         /// <summary>
         /// Gets or Sets parameter value for a given parameter name.

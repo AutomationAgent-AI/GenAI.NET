@@ -1,4 +1,5 @@
 ﻿using Automation.GenerativeAI.Interfaces;
+using Automation.GenerativeAI.Tools;
 using Automation.GenerativeAI.Utilities;
 using System;
 using System.Collections.Generic;
@@ -55,42 +56,42 @@ namespace Automation.GenerativeAI.Stores
     [Serializable]
     internal class OpenAIEmbeddingTransformer : IVectorTransformer
     {
-        private readonly string apiUrl = "https://api.openai.com/v1/embeddings";
-        private string apiKey => Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-
         public int VectorLength => 1536;
 
         public OpenAIEmbeddingTransformer()
-        {
-            
+        {  
         }
+
+        HttpTool HttpTool 
+        {
+            get
+            {
+                var config = Configuration.Instance.OpenAIConfig;
+                var headers = new Dictionary<string, string>();
+                if (config.AzureConfig)
+                {
+                    headers["api-key"] = config.ApiKey;
+                }
+                else
+                {
+                    headers["Authorization"] = $"Bearer {config.ApiKey}";
+                }
+
+                return HttpTool.WithClient().WithDefaultRequestHeaders(headers);
+            }
+        }
+
         public double[] Transform(string textObject)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiUrl);
-            request.Method = "POST";
-            request.Headers.Add("Authorization", $"Bearer {apiKey}");
-            request.ContentType = "application/json";
-            var data = new EmbeddingRequest(){ input  = textObject };
+            var data = new EmbeddingRequest() { input = textObject };
             var serializer = new JavaScriptSerializer();
 
             string jsonPayload = serializer.Serialize(data);
-            byte[] payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
-
-            using(Stream requestStream = request.GetRequestStream())
-            {
-                requestStream.Write(payloadBytes, 0, payloadBytes.Length); 
-            }
-
             try
             {
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                using(Stream responseStream = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
-                    string json = reader.ReadToEnd();
-                    var result = serializer.Deserialize<EmbeddingResult>(json);
-                    return (double[])result;
-                }
+                string json = this.HttpTool.PostAsync(Configuration.Instance.OpenAIConfig.EmbeddingUrl, jsonPayload).GetAwaiter().GetResult();
+                var result = serializer.Deserialize<EmbeddingResult>(json);
+                return (double[])result;
             }
             catch (WebException ex)
             {

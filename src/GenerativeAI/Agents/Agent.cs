@@ -1,5 +1,6 @@
 ﻿using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
+using Automation.GenerativeAI.Stores;
 using Automation.GenerativeAI.Tools;
 using Automation.GenerativeAI.Utilities;
 using System;
@@ -29,7 +30,7 @@ namespace Automation.GenerativeAI.Agents
         /// <summary>
         /// List of messages to record message history
         /// </summary>
-        protected List<ChatMessage> Messages = new List<ChatMessage>();
+        protected IMemoryStore memoryStore = new MemoryStore();
 
         /// <summary>
         /// Collection of allowed tools for agent to use.
@@ -127,6 +128,17 @@ namespace Automation.GenerativeAI.Agents
         }
 
         /// <summary>
+        /// Sets the memory store for the agent
+        /// </summary>
+        /// <param name="memory">External memory store</param>
+        /// <returns>This Agent</returns>
+        public Agent WithMemoryStore(IMemoryStore memory)
+        {
+            memoryStore = memory;
+            return this;
+        }
+
+        /// <summary>
         /// Provide the language model for agent to work on. If a model is not set 
         /// it will use a default language model
         /// </summary>
@@ -146,9 +158,8 @@ namespace Automation.GenerativeAI.Agents
         /// <summary>
         /// Provides a next agent action based on the given message history.
         /// </summary>
-        /// <param name="messages">History of messages as a list</param>
         /// <returns>AgentAction</returns>
-        protected abstract Task<AgentAction> GetNextActionAsync(List<ChatMessage> messages);
+        protected abstract Task<AgentAction> GetNextActionAsync();
 
         /// <summary>
         /// Executes the given objective
@@ -159,11 +170,11 @@ namespace Automation.GenerativeAI.Agents
         /// action logic and then call UpdateToolResponseAsync to proceed further with execution.</returns>
         public async Task<AgentAction> ExecuteAsync(string objective)
         {
-            Messages.Clear(); //Clear the old message before starting on new objective.
+            memoryStore.Clear(); //Clear the old message before starting on new objective.
             Steps.Clear(); //Clear old steps as we are starting a new objective.
 
-            Messages.Add(new ChatMessage(Role.system, SystemPrompt));
-            Messages.Add(new ChatMessage(Role.user, objective));
+            memoryStore.AddMessage(new ChatMessage(Role.system, SystemPrompt));
+            memoryStore.AddMessage(new ChatMessage(Role.user, objective));
             var action = await ExecuteCoreAsync();
             return action;
         }
@@ -175,7 +186,7 @@ namespace Automation.GenerativeAI.Agents
 
             while (done == null)
             {
-                action = await GetNextActionAsync(Messages);
+                action = await GetNextActionAsync();
                 Steps.Add(action);
 
                 done = action as FinishAction;
@@ -193,7 +204,7 @@ namespace Automation.GenerativeAI.Agents
                     //Action can't be executed, return this action to caller so that the caller can execute
                     //based on its execution logic.
                     if (string.IsNullOrEmpty(result)) return action;
-                    Messages.Add(new FunctionMessage(action.Tool.Name, result));
+                    memoryStore.AddMessage(new FunctionMessage(action.Tool.Name, result));
                 }
             }
 
@@ -211,7 +222,7 @@ namespace Automation.GenerativeAI.Agents
         public async Task<AgentAction> UpdateAgentActionResponseAsync(string toolName, string output)
         {
             var msg = new FunctionMessage(toolName, output);
-            Messages.Add(msg);
+            memoryStore.AddMessage(msg);
             return await ExecuteCoreAsync();
         }
 
@@ -277,13 +288,12 @@ namespace Automation.GenerativeAI.Agents
 
     internal class FunctionAgent : Agent
     {
-        private List<ChatMessage> messages = new List<ChatMessage>();
         public FunctionAgent()
         {
 
         }
 
-        protected override async Task<AgentAction> GetNextActionAsync(List<ChatMessage> messages)
+        protected override async Task<AgentAction> GetNextActionAsync()
         {
             var functions = Enumerable.Empty<FunctionDescriptor>();
             if (Tools != null)
@@ -291,7 +301,8 @@ namespace Automation.GenerativeAI.Agents
                 functions = Tools.GetFunctions();
             }
 
-            LLMResponse response = await LanguageModel.GetResponseAsync(messages, functions, Temperature);
+            var history = memoryStore.ChatHistory("").ToList();
+            LLMResponse response = await LanguageModel.GetResponseAsync(history, functions, Temperature);
             if (response.Type == ResponseType.Failed)
             {
                 return new FinishAction(string.Empty, response.Response);
@@ -304,7 +315,7 @@ namespace Automation.GenerativeAI.Agents
             var msg = MessgeFromResponse(response);
             if (Tools != null && response.Type == ResponseType.FunctionCall)
             {
-                Messages.Add(msg);
+                memoryStore.AddMessage(msg);
                 var fmsg = msg as FunctionCallMessage;
                 object function = null;
                 fmsg.function_call.TryGetValue("name", out function);
@@ -321,10 +332,10 @@ namespace Automation.GenerativeAI.Agents
 
         private async Task<AgentAction> ObsoleteExecuteAsync(string objective)
         {
-            if(messages.Count == 0)
+            if(!memoryStore.ChatHistory("").Any())
             {
-                messages.Add(new ChatMessage(Role.system, SystemPrompt));
-                messages.Add(new ChatMessage(Role.user, objective));
+                memoryStore.AddMessage(new ChatMessage(Role.system, SystemPrompt));
+                memoryStore.AddMessage(new ChatMessage(Role.user, objective));
             }
 
             var functions = Enumerable.Empty<FunctionDescriptor>();
@@ -336,12 +347,13 @@ namespace Automation.GenerativeAI.Agents
             LLMResponse response = new LLMResponse() { Type = ResponseType.Failed };
             while (response.Type != ResponseType.Done)
             {
-                response = await LanguageModel.GetResponseAsync(messages, functions, Temperature);
+                var history = memoryStore.ChatHistory("");
+                response = await LanguageModel.GetResponseAsync(history, functions, Temperature);
                 //When there is no tool registered then one call is good
                 if (response.Type == ResponseType.Failed) return new FinishAction(string.Empty, response.Response);
 
                 var msg = MessgeFromResponse(response);
-                messages.Add(msg);
+                memoryStore.AddMessage(msg);
 
                 if (Tools != null && response.Type == ResponseType.FunctionCall)
                 {
@@ -358,12 +370,12 @@ namespace Automation.GenerativeAI.Agents
 
                     if (string.IsNullOrEmpty(output))
                     {
-                        messages.Add(fmsg);
+                        memoryStore.AddMessage(fmsg);
                         var tool = Tools.GetTool((string)function);
                         return new AgentAction(tool, new ExecutionContext(arguments), $"Need to execute {tool.Name}");
                     }
 
-                    messages.Add(new FunctionMessage((string)function, output));
+                    memoryStore.AddMessage(new FunctionMessage((string)function, output));
                 }
             }
             if (response.Type == ResponseType.Done)

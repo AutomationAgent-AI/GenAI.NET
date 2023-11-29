@@ -22,12 +22,13 @@ namespace GenAIFramework.Test
                 { "What is the weather like in San Francisco?", "The weather in San Francisco is warm" },
                 { "sales growth after", "Facebook parent Meta reported a return to sales growth after three quarters of declines." },
                 { "add an amount of 40 units to year 2023 headcount", "{\"name\": \"EditFinancialForecast\",\"arguments\": \"{ \\\"year\\\": 2023, \\\"category\\\": \\\"headcount\\\", \\\"amount\\\": 40}\"}" },
-                { "{\"headcount\":240,\"opex\":500}", "{\"name\": \"EditFinancialForecast\",\"arguments\": \"{ \\\"year\\\": 2023, \\\"category\\\": \\\"opex\\\", \\\"amount\\\": -23}\"}"},
+                { "{\"headcount\":240,\"opex\":500}", "{\"name\": \"EditFinancialForecast\",\"arguments\": \"{ \\\"year\\\": 2022, \\\"category\\\": \\\"opex\\\", \\\"amount\\\": -23}\"}"},
                 { "{\"headcount\":240,\"opex\":477}", "{\"name\": \"PrintFinancialForecast\",\"arguments\": \"{ \\\"printer\\\": \\\"HomePrinter\\\"}\"}"},
                 { "Printed the forecast to", "Updated the financial forecast and printed at home" }
             };
 
             var model = new MockLanguageModel("Mock", responses);
+            //var model = new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig);
             return model;
         }
 
@@ -401,7 +402,7 @@ namespace GenAIFramework.Test
             step = FunctionTool.Deserialize<StepAction>(action);
             Assert.IsNotNull(step);
             Assert.AreEqual("EditFinancialForecast", step.tool);
-            Assert.AreEqual(2023, step.parameters["year"]);
+            Assert.AreEqual(2022, step.parameters["year"]);
             Assert.AreEqual("opex", step.parameters["category"]);
             Assert.AreEqual(-23, step.parameters["amount"]);
 

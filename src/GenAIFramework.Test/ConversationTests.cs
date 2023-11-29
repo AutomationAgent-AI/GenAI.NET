@@ -100,7 +100,8 @@ namespace GenAIFramework.Test
             };
 
             var languageModel = new MockLanguageModel("Mock", responses);
-            //languageModel = new OpenAILanguageModel("gpt-3.5-turbo-0613");
+            //var languageModel = new OpenAILanguageModel("gpt-3.5-turbo-0613");
+            //var languageModel = new AzureOpenAILanguageModel(Configuration.Instance.OpenAIConfig);
             GenerativeApp.SetLanguageModel(languageModel);
             return languageModel;
         }

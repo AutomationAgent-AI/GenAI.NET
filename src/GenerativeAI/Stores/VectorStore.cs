@@ -98,8 +98,6 @@ namespace Automation.GenerativeAI.Stores
 
         public static VectorStore Create(string recepiefile)
         {
-            System.Diagnostics.Debugger.Break();
-
             var ext = Path.GetExtension(recepiefile);
             if (ext.ToLower().Contains("vdb"))
             {
@@ -150,15 +148,16 @@ namespace Automation.GenerativeAI.Stores
                     {
                         store.transformer = (IVectorTransformer)formatter.Deserialize(gzip);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        if(nVectorLength == 1536)
+                        if (nVectorLength == 1536)
                         {
+                            Logger.WriteLog(LogLevel.Warning, LogOps.Exception, $"Couldn't deserialize vector transformer, creating a default transformer. Exception: {ex.Message}");
                             store.transformer = new OpenAIEmbeddingTransformer();
                         }
                         else
                         {
-                            throw;
+                            throw ex;
                         }
                     }
                 }

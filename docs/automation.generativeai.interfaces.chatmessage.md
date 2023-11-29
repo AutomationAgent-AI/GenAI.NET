@@ -17,7 +17,7 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 Role of the messenger
 
 ```csharp
-public string role { get; private set; }
+public string role { get; set; }
 ```
 
 #### Property Value

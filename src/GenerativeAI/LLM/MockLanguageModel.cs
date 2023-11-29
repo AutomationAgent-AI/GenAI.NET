@@ -18,6 +18,7 @@ namespace Automation.GenerativeAI.LLM
     {
         private readonly string model;
         private readonly Dictionary<string, string> responses;
+        private readonly OpenAIClient client = new OpenAIClient(new OpenAIConfig());
 
         /// <summary>
         /// Create the language model instance with a dictionary of request and response.
@@ -39,6 +40,8 @@ namespace Automation.GenerativeAI.LLM
         /// Gets model name
         /// </summary>
         public string ModelName => model;
+
+        public IVectorTransformer VectorTransformer => client.VectorTransformer;
 
         /// <summary>
         /// Gets the response for given list of chat messages

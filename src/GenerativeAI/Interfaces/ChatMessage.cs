@@ -53,7 +53,7 @@ namespace Automation.GenerativeAI.Interfaces
         /// <summary>
         /// Role of the messenger
         /// </summary>
-        public string role { get; private set; }
+        public string role { get; set; }
 
         /// <summary>
         /// Message content

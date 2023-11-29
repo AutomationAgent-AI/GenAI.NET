@@ -15,8 +15,6 @@ Implements [ILanguageModel](./automation.generativeai.interfaces.ilanguagemodel.
 
 ### **ModelName**
 
-Name of the model used within OpenAI
-
 ```csharp
 public string ModelName { get; }
 ```
@@ -24,6 +22,16 @@ public string ModelName { get; }
 #### Property Value
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### **VectorTransformer**
+
+```csharp
+public IVectorTransformer VectorTransformer { get; }
+```
+
+#### Property Value
+
+[IVectorTransformer](./automation.generativeai.interfaces.ivectortransformer.md)<br>
 
 ## Constructors
 
@@ -48,8 +56,6 @@ API key of OpenAI, if passed empty string, it will try
 
 ### **GetResponseAsync(IEnumerable&lt;ChatMessage&gt;, Double)**
 
-Gets response based on given history of messages.
-
 ```csharp
 public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, double temperature)
 ```
@@ -57,77 +63,14 @@ public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, dou
 #### Parameters
 
 `messages` [IEnumerable&lt;ChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-A list of messages as a history. The Response is generated for 
- the last message using the history of messages as context.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 1, that controls randomness of the response. 
- Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
 
 #### Returns
 
 [Task&lt;LLMResponse&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
-An LLMResponse response object
-
-### **GetResponse(IEnumerable&lt;ChatMessage&gt;, IEnumerable&lt;FunctionDescriptor&gt;, Double)**
-
-If the language model supports function calling then this method can be called to
- get the response based on the given history of messages.
-
-```csharp
-public LLMResponse GetResponse(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)
-```
-
-#### Parameters
-
-`messages` [IEnumerable&lt;ChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-A list of messages as a history. The response is generated for 
- the last message using the history of messages as context.
-
-`functions` [IEnumerable&lt;FunctionDescriptor&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-A list of function descriptors to match if the request resolves 
- to function calling.
-
-`temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 1, that controls randomness of the response. 
- Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
-
-#### Returns
-
-[LLMResponse](./automation.generativeai.interfaces.llmresponse.md)<br>
-An LLMResponse response object
-
-### **ToFunctions(IEnumerable&lt;FunctionDescriptor&gt;)**
-
-```csharp
-internal static List<Dictionary<string, object>> ToFunctions(IEnumerable<FunctionDescriptor> functions)
-```
-
-#### Parameters
-
-`functions` [IEnumerable&lt;FunctionDescriptor&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-
-#### Returns
-
-[List&lt;Dictionary&lt;String, Object&gt;&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1)<br>
-
-### **ToJSON(IEnumerable&lt;FunctionDescriptor&gt;)**
-
-```csharp
-internal static string ToJSON(IEnumerable<FunctionDescriptor> functions)
-```
-
-#### Parameters
-
-`functions` [IEnumerable&lt;FunctionDescriptor&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-
-#### Returns
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **GetResponseAsync(IEnumerable&lt;ChatMessage&gt;, IEnumerable&lt;FunctionDescriptor&gt;, Double)**
-
-Gets response from the language model asynchronously.
 
 ```csharp
 public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)
@@ -136,18 +79,29 @@ public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, IEn
 #### Parameters
 
 `messages` [IEnumerable&lt;ChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-A list of messages as a history. The response is generated for 
- the last message using the history of messages as context.
 
 `functions` [IEnumerable&lt;FunctionDescriptor&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
-A list of function descriptors to match if the request resolves 
- to function calling.
 
 `temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A value between 0 to 1, that controls randomness of the response. 
- Higher temperature will lead to more randomness. Lower temperature will be more deterministic.
 
 #### Returns
 
 [Task&lt;LLMResponse&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
-An LLMResponse response object
+
+### **GetResponse(IEnumerable&lt;ChatMessage&gt;, IEnumerable&lt;FunctionDescriptor&gt;, Double)**
+
+```csharp
+public LLMResponse GetResponse(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature)
+```
+
+#### Parameters
+
+`messages` [IEnumerable&lt;ChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+`functions` [IEnumerable&lt;FunctionDescriptor&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+`temperature` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+
+#### Returns
+
+[LLMResponse](./automation.generativeai.interfaces.llmresponse.md)<br>

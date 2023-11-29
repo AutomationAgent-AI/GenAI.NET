@@ -32,7 +32,7 @@ public Dictionary<string, object> function_call { get; set; }
 Role of the messenger
 
 ```csharp
-public string role { get; }
+public string role { get; set; }
 ```
 
 #### Property Value

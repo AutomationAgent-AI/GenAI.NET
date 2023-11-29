@@ -66,11 +66,15 @@
     <Compile Include="Application.cs" />
     <Compile Include="Chat\Conversation.cs" />
     <Compile Include="Chat\PromptTemplate.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Interfaces\ChatMessage.cs" />
     <Compile Include="Interfaces\ExecutionContext.cs" />
     <Compile Include="Interfaces\TextObject.cs" />
+    <Compile Include="LLM\AzureOpenAILanguageModel.cs" />
     <Compile Include="LLM\MockLanguageModel.cs" />
+    <Compile Include="LLM\OpenAIClient.cs" />
     <Compile Include="Services\PDFTextProvider.cs" />
+    <Compile Include="Stores\MemoryStore.cs" />
     <Compile Include="Tools\BingSearch.cs" />
     <Compile Include="Tools\CombineTool.cs" />
     <Compile Include="Tools\DataExtractorTool.cs" />
@@ -106,9 +110,7 @@
     <None Include="ClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Prompts\MRKLPrompt.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
