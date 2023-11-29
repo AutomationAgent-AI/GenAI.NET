@@ -25,6 +25,16 @@ public string ModelName { get; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
+### **VectorTransformer**
+
+```csharp
+public IVectorTransformer VectorTransformer { get; }
+```
+
+#### Property Value
+
+[IVectorTransformer](./automation.generativeai.interfaces.ivectortransformer.md)<br>
+
 ## Constructors
 
 ### **MockLanguageModel(String, Dictionary&lt;String, String&gt;)**

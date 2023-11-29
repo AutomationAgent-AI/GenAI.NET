@@ -54,6 +54,8 @@
 
 [IMatchedObject](./automation.generativeai.interfaces.imatchedobject.md)
 
+[IMemoryStore](./automation.generativeai.interfaces.imemorystore.md)
+
 [ITextObject](./automation.generativeai.interfaces.itextobject.md)
 
 [IVectorStore](./automation.generativeai.interfaces.ivectorstore.md)
@@ -75,6 +77,10 @@
 [MockLanguageModel](./automation.generativeai.llm.mocklanguagemodel.md)
 
 [OpenAILanguageModel](./automation.generativeai.llm.openailanguagemodel.md)
+
+## Automation.GenerativeAI.Stores
+
+[MemoryStore](./automation.generativeai.stores.memorystore.md)
 
 ## Automation.GenerativeAI.Tools
 

@@ -22,6 +22,18 @@ public abstract string ModelName { get; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
+### **VectorTransformer**
+
+Gets vector transformer for semantic search
+
+```csharp
+public abstract IVectorTransformer VectorTransformer { get; }
+```
+
+#### Property Value
+
+[IVectorTransformer](./automation.generativeai.interfaces.ivectortransformer.md)<br>
+
 ## Methods
 
 ### **GetResponseAsync(IEnumerable&lt;ChatMessage&gt;, Double)**

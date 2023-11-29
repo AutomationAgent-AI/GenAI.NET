@@ -15,4 +15,4 @@ Implements [IComparable](https://docs.microsoft.com/en-us/dotnet/api/system.icom
 
 | Name | Value | Description |
 | --- | --: | --- |
-| OpenAIEmbedding | 0 | Uses text embedding using OpenAI API. The API key of OpenAI must be set as 'OPENAI_API_KEY' Environment variable. |
+| OpenAIEmbedding | 0 | Uses text embedding using Azure/OpenAI API. |

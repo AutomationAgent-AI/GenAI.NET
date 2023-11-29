@@ -25,6 +25,7 @@ namespace GenAIFramework.Test
                 File.Delete(logfile);
             }            
             Logger.SetLogFile(logfile);
+            Configuration.Instance.OpenAIConfig = new OpenAIConfig();
         }
 
 

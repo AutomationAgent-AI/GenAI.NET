@@ -12,6 +12,18 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 
 ## Properties
 
+### **MemoryStore**
+
+Gets the memory store for the context
+
+```csharp
+public IMemoryStore MemoryStore { get; }
+```
+
+#### Property Value
+
+[IMemoryStore](./automation.generativeai.interfaces.imemorystore.md)<br>
+
 ### **Item**
 
 ```csharp
@@ -45,6 +57,22 @@ public ExecutionContext(Dictionary<string, object> parameters)
 `parameters` [Dictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2)<br>
 Parameters dictionary
 
+### **ExecutionContext(IMemoryStore, Dictionary&lt;String, Object&gt;)**
+
+Creates ExecutionContext with memory and parameters
+
+```csharp
+public ExecutionContext(IMemoryStore memoryStore, Dictionary<string, object> parameters)
+```
+
+#### Parameters
+
+`memoryStore` [IMemoryStore](./automation.generativeai.interfaces.imemorystore.md)<br>
+Memory
+
+`parameters` [Dictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2)<br>
+Parameters dictionary
+
 ## Methods
 
 ### **GetParameters()**
@@ -56,6 +84,24 @@ internal IDictionary<string, object> GetParameters()
 #### Returns
 
 [IDictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.idictionary-2)<br>
+
+### **WithMemory(IMemoryStore)**
+
+Sets the memory store
+
+```csharp
+public ExecutionContext WithMemory(IMemoryStore memory)
+```
+
+#### Parameters
+
+`memory` [IMemoryStore](./automation.generativeai.interfaces.imemorystore.md)<br>
+Memory
+
+#### Returns
+
+[ExecutionContext](./automation.generativeai.interfaces.executioncontext.md)<br>
+Updated ExecutionContext
 
 ### **TryGetResult(String, Object&)**
 

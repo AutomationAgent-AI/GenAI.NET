@@ -5,7 +5,7 @@ Namespace: Automation.GenerativeAI.Interfaces
 Represents a function toolset that provides multiple functions
 
 ```csharp
-public interface IFunctionToolSet : System.Collections.Generic.IEnumerable`1[[Automation.GenerativeAI.Interfaces.IFunctionTool, GenerativeAI, Version=1.1.8661.30687, Culture=neutral, PublicKeyToken=null]], System.Collections.IEnumerable
+public interface IFunctionToolSet : System.Collections.Generic.IEnumerable`1[[Automation.GenerativeAI.Interfaces.IFunctionTool, GenerativeAI, Version=1.2.8734.98, Culture=neutral, PublicKeyToken=null]], System.Collections.IEnumerable
 ```
 
 Implements [IEnumerable&lt;IFunctionTool&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1), [IEnumerable](https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable)

@@ -79,7 +79,7 @@ internal static TextProviderService GetTextProviderService()
 Application must be initialized before making any request.
 
 ```csharp
-public void Initialize(string llmtype, string model, string apikey, string logFilePath)
+public static void Initialize(string llmtype, string model, string apikey, string logFilePath)
 ```
 
 #### Parameters
@@ -99,6 +99,37 @@ Full path for log files.
 #### Exceptions
 
 [NotImplementedException](https://docs.microsoft.com/en-us/dotnet/api/system.notimplementedexception)<br>
+
+### **InitializeAzureOpenAI(String, String, String, String, String, String, String)**
+
+Initializes AzureOpenAI language model. Application must be initialized before making any request.
+
+```csharp
+public static void InitializeAzureOpenAI(string azureEndpoint, string gptDeployment, string embeddingDeployment, string apiversion, string apiKey, string model, string logFilePath)
+```
+
+#### Parameters
+
+`azureEndpoint` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Endpoint URL for Azure OpenAI service
+
+`gptDeployment` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Deployment Name for GPT model
+
+`embeddingDeployment` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Deployment Name for text embedding model
+
+`apiversion` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+API version
+
+`apiKey` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+ApiKey for the language model
+
+`model` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Model name to be used for chat completion
+
+`logFilePath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Full path for log file.
 
 ### **SetLogFilePath(String)**
 
@@ -368,6 +399,73 @@ A JSON string with key value pairs as a context holding variable values to execu
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 Output string as a result of the execution if successful, else error message starting with ERROR.
+
+### **ExecuteTool(String, String, String)**
+
+Executes a given tool with the arguments passed and returns the 
+ output as a string. For complex objects it returns JSON string.
+
+```csharp
+public static string ExecuteTool(string sessionName, string toolName, string executionContext)
+```
+
+#### Parameters
+
+`sessionName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the session to access memory store
+
+`toolName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the tool to execute
+
+`executionContext` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+A JSON string with key value pairs as a context holding variable values to execute the tool.
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Output string as a result of the execution if successful, else error message starting with ERROR.
+
+### **RestoreSession(String, String)**
+
+Restores a session with the given session file.
+
+```csharp
+public static string RestoreSession(string sessionName, string sessionFilePath)
+```
+
+#### Parameters
+
+`sessionName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the session
+
+`sessionFilePath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Full path of the session file
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Status of the operation
+
+### **SaveSession(String, String)**
+
+Saves a given session to a file.
+
+```csharp
+public static string SaveSession(string sessionName, string sessionFilePath)
+```
+
+#### Parameters
+
+`sessionName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Name of the session
+
+`sessionFilePath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Full path of the session file to save the session.
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Status of the operation
 
 ### **GetExecutionResult(String)**
 
