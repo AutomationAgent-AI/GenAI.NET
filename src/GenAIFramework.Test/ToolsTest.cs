@@ -474,5 +474,47 @@ Final Answer:";
             Assert.AreEqual(3, searchresults.Length);
             Assert.IsTrue(searchresults.Any(r => r.content.Contains("three quarter")));
         }
+
+        [TestMethod]
+        public async Task DataExtractorPipeline()
+        {
+            Logger.WriteLog(LogLevel.Info, LogOps.Test, "DataExtractorPipeline");
+
+            var textExtractor = TextExtractorTool.Create();
+            Assert.IsNotNull(textExtractor);
+
+            var parameters = new Dictionary<string, string>()
+            {
+                { "Revenue Growth", "What is the revenue growth in dollars in Q1 2023?" },
+                { "Revenue Growth Percent", "What is the revenue growth in percentage in Q1 2023?" },
+                { "Revenue Forecast", "What is the revenue forecast for Q2 2023?" },
+                { "Net Income", "What is the net income in dollars in Q1 2023?" },
+                { "Stock Price Change", "What is the change is stock price after the quarterly results of Q1?" },
+                { "Market Sentiment", "Based on market response, what is the market sentiment (positive or negative) after the results?" },
+                { "Challenges", "What are the key challenges mentioned in this report?" },
+                { "Initiatives", "What is the key initiatives to mitigate challenges are mentioned in this report?" },
+            };
+
+            //var llm = new OpenAILanguageModel("gpt-3.5-turbo");
+            //var prametersJson = FunctionTool.ToJsonString(parameters);
+            var dataExtractor = DataExtractorTool.Create()
+                                                 .WithParameters(parameters);
+                                                 //.WithLanguageModel(llm);
+
+            Assert.IsNotNull(dataExtractor);
+
+            var pipeline = Pipeline.WithTools(new IFunctionTool[]  {textExtractor, dataExtractor});
+            Assert.IsNotNull(pipeline);
+            
+            var file = Path.Combine(RootPath, @"..\..\..\..\..\tests\input\article.txt");
+            var context = new ExecutionContext();
+            context["input"] = file;
+
+            var result = await pipeline.ExecuteAsync(context);
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
+
+            var results = FunctionTool.Deserialize<Dictionary<string, string>>(result);
+            Assert.AreEqual(8, results.Count);
+        }
     }
 }

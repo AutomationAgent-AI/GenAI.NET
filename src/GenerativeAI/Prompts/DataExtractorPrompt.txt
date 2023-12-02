@@ -1,0 +1,7 @@
+﻿Extract arguments and values from the below CONTEXT only based on function specification provided, 
+do not include extra parameter and always return your answers in a valid JSON format. 
+
+CONTEXT:
+Today's Date: {{$Today}}
+
+{{$text}}

@@ -43,6 +43,12 @@ namespace Automation.GenerativeAI.LLM
 
         public IVectorTransformer VectorTransformer => client.VectorTransformer;
 
+        public int PromptTokensUsed => throw new NotImplementedException();
+
+        public int CompletionTokensUsed => throw new NotImplementedException();
+
+        public int MaxTokenLimit => 4000; //default is 4K
+
         /// <summary>
         /// Gets the response for given list of chat messages
         /// </summary>

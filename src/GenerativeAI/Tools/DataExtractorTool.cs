@@ -1,5 +1,6 @@
 ﻿using Automation.GenerativeAI.Chat;
 using Automation.GenerativeAI.Interfaces;
+using Automation.GenerativeAI.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,8 +15,7 @@ namespace Automation.GenerativeAI.Tools
     /// </summary>
     public class DataExtractorTool : FunctionTool
     {
-        private readonly int ChunkingThreshold = 3000;
-        private readonly int ChunkSize = 2000;
+        private readonly int ChunkSize = 1200;
         private readonly int ChunkOverlap = 200;
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Automation.GenerativeAI.Tools
             return new DataExtractorTool() { Name = "DataExtractor" };
         }
 
-        private PromptTemplate extratorPrompt = new PromptTemplate("Extract arguments and values from the following text only based on function specification provided, do not include extra parameter. {{$text}}");
+        private PromptTemplate extratorPrompt = null;
         private double temperature = 0.8;
 
         /// <summary>
@@ -133,6 +133,14 @@ namespace Automation.GenerativeAI.Tools
             }
         }
 
+        private bool FitsInLLMContextWindow(int promptSize, int paramCount)
+        {
+            var estCompletionTokens = paramCount * 50;
+            var estPrompToken = (promptSize + estCompletionTokens) / 3.8;
+
+            return estCompletionTokens + estPrompToken < LanguageModel.MaxTokenLimit;
+        }
+
         /// <summary>
         /// Extracts data based on the parameters provided from the given text asynchronously
         /// </summary>
@@ -145,50 +153,69 @@ namespace Automation.GenerativeAI.Tools
             //3. Combine the search results into a single text block
             //4. Use language model to extract the parameters
             var results = new Dictionary<string, string>();
-            if (text.Length > ChunkingThreshold)
+            if (!FitsInLLMContextWindow(text.Length, parameters.Count))
             {
-                var searchtoool = SearchTool.ForSemanticSearchFromSource(text, ChunkSize, ChunkOverlap).WithMaxResultCount(2);
-                foreach (var item in parameters) 
+                var searchtoool = SearchTool.ForSemanticSearchFromSource(text, ChunkSize, ChunkOverlap).WithMaxResultCount(5);
+                var resultslist = new List<SearchResult>();
+                var sizeDictionary = new Dictionary<string, int>();
+                int contentLength = 0;
+                var plist = new List<ParameterDescriptor>();
+                var context = string.Empty;
+                foreach (var item in parameters)
                 {
-                    var r = await searchtoool.SearchAsync($"{item.Name}:{item.Description}", string.Empty);
-
-                    var txt = string.Join("\n", r.Select(x => x.content));
-
-                    var func = new FunctionDescriptor(Name, "Extracts parameters", Enumerable.Repeat(item, 1));
-
-                    var chatmsg = FormatPrompt(extratorPrompt, txt);
-                    var response = await languageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, temperature);
-                    if(response.Type == ResponseType.FunctionCall)
+                    var searchResults = await searchtoool.SearchAsync($"{item.Name}:{item.Description}", string.Empty);
+                    foreach (var res in searchResults)
                     {
-                        var arguments = GetArgumentValues(response);
-                        object value;
-                        if(arguments.TryGetValue(item.Name, out value))
+                        if (!sizeDictionary.ContainsKey(res.reference))
                         {
-                            results.Add(item.Name, value.ToString());
+                            sizeDictionary[res.reference] = res.content.Length;
+                            contentLength += res.content.Length;
                         }
+                    }
+
+                    if (!FitsInLLMContextWindow(contentLength, plist.Count+1))
+                    {
+                        var texts = resultslist.Distinct().OrderBy(x => x.reference).Select(x => x.content).ToArray();
+                        context = string.Join(Environment.NewLine, texts);
+                        await ExtractDataAsync(results, context, plist);
+
+                        //Clear the temp data to start new LLM call for the remaining parameters
+                        resultslist.Clear();
+                        sizeDictionary.Clear();
+                        plist.Clear();
+                        contentLength = 0;
+                    }
+                    plist.Add(item);
+                    resultslist.AddRange(searchResults);
+                }
+
+                var txts = resultslist.Distinct().OrderBy(x => x.reference).Select(x => x.content).ToArray();
+                context = string.Join(Environment.NewLine, txts);
+                await ExtractDataAsync(results, context, plist);
+
+                return results;
+            }
+            return await ExtractDataAsync(results, text, parameters);
+        }
+
+        private async Task<Dictionary<string, string>> ExtractDataAsync(Dictionary<string, string> results, string context, List<ParameterDescriptor> paremeterList)
+        {
+            var func = new FunctionDescriptor(Name, "Processes a given context", paremeterList);
+
+            var chatmsg = LoadSystemPrompt(System.DateTime.Today.ToShortDateString(), context);
+            var response = await LanguageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, temperature);
+            if (response.Type == ResponseType.FunctionCall)
+            {
+                var arguments = GetArgumentValues(response);
+                foreach (var p in paremeterList)
+                {
+                    object value;
+                    if (arguments.TryGetValue(p.Name, out value))
+                    {
+                        results.Add(p.Name, value.ToString());
                     }
                 }
             }
-            else
-            {
-                var func = new FunctionDescriptor(Name, "Extracts parameters", parameters);
-
-                var chatmsg = FormatPrompt(extratorPrompt, text);
-                var response = await LanguageModel.GetResponseAsync(new[] { chatmsg }, new[] { func }, temperature);
-                if (response.Type == ResponseType.FunctionCall)
-                {
-                    var arguments = GetArgumentValues(response);
-                    foreach (var p in parameters)
-                    {
-                        object value;
-                        if (arguments.TryGetValue(p.Name, out value))
-                        {
-                            results.Add(p.Name, value.ToString());
-                        }
-                    }
-                }
-            }
-
             return results;
         }
 
@@ -238,6 +265,26 @@ namespace Automation.GenerativeAI.Tools
         {
             var ctx = new ExecutionContext();
             ctx[prompt.Variables.First()] = input;
+            return prompt.FormatMessage(ctx);
+        }
+
+        private ChatMessage LoadSystemPrompt(string date, string input)
+        {
+            PromptTemplate prompt = extratorPrompt;
+            var ctx = new ExecutionContext(); 
+            if (prompt == null)
+            {
+                var template = EmbeddedResource.GetrResource("Automation.GenerativeAI.Prompts.DataExtractorPrompt.txt");
+                prompt = new PromptTemplate(template, Role.system);
+
+                ctx[prompt.Variables[0]] = date;
+                ctx[prompt.Variables[1]] = input;
+            }
+            else
+            {
+                ctx[prompt.Variables[0]] = input;
+            }
+            
             return prompt.FormatMessage(ctx);
         }
     }
