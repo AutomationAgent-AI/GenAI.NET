@@ -1,4 +1,5 @@
 ﻿using Automation.GenerativeAI.Interfaces;
+using Automation.GenerativeAI.LLM;
 using Automation.GenerativeAI.Tools;
 using Automation.GenerativeAI.Utilities;
 using System;
@@ -20,6 +21,8 @@ namespace Automation.GenerativeAI.Stores
         /// List of results of the embedding
         /// </summary>
         public List<Data> data { get; set; }
+
+        public Usage usage { get; set; }
 
         /// <summary>
         /// Allows an EmbeddingResult to be implicitly cast to the array of floats repsresenting the first ebmedding result
@@ -91,6 +94,7 @@ namespace Automation.GenerativeAI.Stores
             {
                 string json = this.HttpTool.PostAsync(Configuration.Instance.OpenAIConfig.EmbeddingUrl, jsonPayload).GetAwaiter().GetResult();
                 var result = serializer.Deserialize<EmbeddingResult>(json);
+                Logger.WriteLog(LogLevel.Info, LogOps.Response, $"Prompts Tokens: {result.usage.prompt_tokens}");
                 return (double[])result;
             }
             catch (WebException ex)

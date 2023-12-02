@@ -81,7 +81,7 @@ namespace Automation.GenerativeAI.Stores
         {
             if(message == null) return 0;
             if(message.content !=null) return message.content.Length;
-            return 0;
+            return 100; //assume 100 characters for function call messages
         }
 
         /// <summary>

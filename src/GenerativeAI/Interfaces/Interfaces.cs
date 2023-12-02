@@ -41,6 +41,21 @@ namespace Automation.GenerativeAI.Interfaces
         /// Higher temperature will lead to more randomness. Lower temperature will be more deterministic.</param>
         /// <returns>An LLMResponse response object</returns>
         Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, IEnumerable<FunctionDescriptor> functions, double temperature);
+
+        /// <summary>
+        /// Returns number of Prompt tokens used so far.
+        /// </summary>
+        int PromptTokensUsed { get; }
+
+        /// <summary>
+        /// Returns number of Completion tokens used so far.
+        /// </summary>
+        int CompletionTokensUsed { get; }
+
+        /// <summary>
+        /// Returns max token limit of the LLM for prompt and completion.
+        /// </summary>
+        int MaxTokenLimit { get; }
     }
 
     /// <summary>

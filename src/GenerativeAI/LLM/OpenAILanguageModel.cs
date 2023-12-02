@@ -30,6 +30,14 @@ namespace Automation.GenerativeAI.LLM
         public string id { get; set; }
         public int created { get; set; }
         public Choice[] choices { get; set; }
+        public Usage usage { get; set; }
+    }
+
+    internal class Usage
+    {
+        public int prompt_tokens { get; set; }
+        public int completion_tokens { get; set; }
+        public int total_tokens { get; set; }
     }
 
     /// <summary>
@@ -47,17 +55,19 @@ namespace Automation.GenerativeAI.LLM
         /// to get the API key using OPENAI_API_KEY environment variable.</param>
         public OpenAILanguageModel(string model, string apikey = "") 
         {
-            if(string.IsNullOrEmpty(apikey))
-            {
-                apikey = Configuration.Instance.OpenAIConfig.ApiKey;
-            }
-
-            openAIClient = new OpenAIClient(new OpenAIConfig() { ApiKey = apikey, Model = model });
+            var config = new OpenAIConfig() { ApiKey = apikey, Model = model };
+            openAIClient = new OpenAIClient(config);
         }
 
         public string ModelName => openAIClient.ModelName;
 
         public IVectorTransformer VectorTransformer => openAIClient.VectorTransformer;
+
+        public int PromptTokensUsed => openAIClient.PromptTokensUsed;
+
+        public int CompletionTokensUsed => openAIClient.CompletionTokensUsed;
+
+        public int MaxTokenLimit => openAIClient.MaxTokenLimit;
 
         public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, double temperature)
         {

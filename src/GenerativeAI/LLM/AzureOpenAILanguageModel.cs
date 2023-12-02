@@ -23,6 +23,12 @@ namespace Automation.GenerativeAI.LLM
 
         public IVectorTransformer VectorTransformer => openAIClient.VectorTransformer;
 
+        public int PromptTokensUsed => openAIClient.PromptTokensUsed;
+
+        public int CompletionTokensUsed => openAIClient.CompletionTokensUsed;
+
+        public int MaxTokenLimit => openAIClient.MaxTokenLimit;
+
         public Task<LLMResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, double temperature)
         {
             return openAIClient.GetResponseAsync(messages, temperature);

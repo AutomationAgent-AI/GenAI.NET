@@ -137,7 +137,7 @@ namespace Automation.GenerativeAI.Tools
                 {
                     context.AddResult(Name, retval);
                     output = ToJsonString(retval);
-                    Logger.WriteLog(LogLevel.Info, LogOps.Result, output);
+                    Logger.WriteLog(LogLevel.Info, LogOps.Result, output.Substring(0, output.Length > 500 ? 500 : output.Length));
                 }
                 else
                 {

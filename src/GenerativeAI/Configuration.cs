@@ -5,13 +5,36 @@ using System.Web.Script.Serialization;
 
 namespace Automation.GenerativeAI
 {
+    /// <summary>
+    /// Implements the configuration for OpenAI/AzureOpenAI
+    /// </summary>
     internal class OpenAIConfig
     {
+        /// <summary>
+        /// Endpoint URL which contains resource name for azure
+        /// </summary>
         public string EndPointUrl { get; set; }
+
+        /// <summary>
+        /// Deployment ID for GPT Model in Azure
+        /// </summary>
         public string GPTDeployment { get; set; }
+
+        /// <summary>
+        /// Deployment ID for Text Embedding model in Azure
+        /// </summary>
         public string EmbeddingDeployment { get; set; }
+
+        /// <summary>
+        /// ApiVersion, applicable to Azure
+        /// </summary>
         public string ApiVersion { get; set; }
-        private string apiKey;
+
+        private string apiKey; //stores api key
+        
+        /// <summary>
+        /// API Key
+        /// </summary>
         public string ApiKey 
         {
             get
@@ -34,7 +57,20 @@ namespace Automation.GenerativeAI
                 apiKey = value;
             } 
         }
-        public string Model { get; set; }
+
+        /// <summary>
+        /// GPT Model Name
+        /// </summary>
+        public string Model { get; set; } = "gpt-3.5-turbo"; //default model for OpenAI
+
+        /// <summary>
+        /// Provides token limit for the given model
+        /// </summary>
+        public int TokenLimit { get; set; } = 4000; //Default is 4K model
+        
+        /// <summary>
+        /// Gets full URL for the Text Embedding API
+        /// </summary>
         public string EmbeddingUrl 
         { 
             get 
@@ -49,6 +85,9 @@ namespace Automation.GenerativeAI
             } 
         }
 
+        /// <summary>
+        /// Gets full URL for the chat completion API
+        /// </summary>
         public string CompletionsUrl
         {
             get
@@ -63,6 +102,9 @@ namespace Automation.GenerativeAI
             }
         }
 
+        /// <summary>
+        /// Checks if it is Azure config
+        /// </summary>
         public bool AzureConfig
         {
             get
@@ -76,11 +118,21 @@ namespace Automation.GenerativeAI
         }
     }
 
+    /// <summary>
+    /// Implements config for Bing Search API
+    /// </summary>
     internal class BingAPIConfig
     {
+        /// <summary>
+        /// Bing API endpoint url
+        /// </summary>
         public string EndPointUrl { get; set; } = "https://api.bing.microsoft.com/v7.0/";
 
-        private string apiKey;
+        private string apiKey; //stores api key
+
+        /// <summary>
+        /// Api Key
+        /// </summary>
         public string ApiKey
         {
             get
@@ -98,11 +150,20 @@ namespace Automation.GenerativeAI
         }
     }
 
+    /// <summary>
+    /// Implements a configuration
+    /// </summary>
     internal class Configuration
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public Configuration() { }
         private static Configuration instance = null;
 
+        /// <summary>
+        /// Global instance of the configuration
+        /// </summary>
         public static Configuration Instance
         {
             get
@@ -117,12 +178,25 @@ namespace Automation.GenerativeAI
             }
         }
 
+        /// <summary>
+        /// Configuration for OpenAI or AzureOpenAI APIs
+        /// </summary>
         public OpenAIConfig OpenAIConfig { get; set; } = new OpenAIConfig();
 
+        /// <summary>
+        /// Configuration for Bing API
+        /// </summary>
         public BingAPIConfig BingAPIConfig { get; set; } = new BingAPIConfig();
 
+        /// <summary>
+        /// Log file path
+        /// </summary>
         public string LogFile { get; set; }
 
+        /// <summary>
+        /// Gets executing DLL Path
+        /// </summary>
+        /// <returns></returns>
         internal static string GetDLLPath()
         {
             var asm = Assembly.GetExecutingAssembly();
@@ -133,6 +207,10 @@ namespace Automation.GenerativeAI
             return path;
         }
 
+        /// <summary>
+        /// Saves the config as json to a given file
+        /// </summary>
+        /// <param name="filePath">Full file path to save the config as json</param>
         public void Save(string filePath)
         {
             var jsonfile = Path.ChangeExtension(filePath, "json");
@@ -141,6 +219,11 @@ namespace Automation.GenerativeAI
             File.WriteAllText(jsonfile, jsontxt);
         }
 
+        /// <summary>
+        /// Loads the configuration from the given json file
+        /// </summary>
+        /// <param name="filePath">Full path of config json file</param>
+        /// <returns>Configuration</returns>
         public static Configuration Load(string filePath)
         {
             if(!File.Exists(filePath)) return new Configuration();

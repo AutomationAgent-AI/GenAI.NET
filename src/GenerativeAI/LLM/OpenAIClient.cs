@@ -5,6 +5,7 @@ using Automation.GenerativeAI.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
@@ -17,9 +18,15 @@ namespace Automation.GenerativeAI.LLM
         /// </summary>
         public string ModelName => config.Model;
 
-        public int VectorLength => throw new NotImplementedException();
-
         public IVectorTransformer VectorTransformer => transformer;
+
+        private int promptTokens = 0;
+        public int PromptTokensUsed => promptTokens;
+
+        private int completionTokens = 0;
+        public int CompletionTokensUsed => completionTokens;
+
+        public int MaxTokenLimit => config.TokenLimit;
 
         private readonly IVectorTransformer transformer;
         private readonly OpenAIConfig config;
@@ -126,8 +133,17 @@ namespace Automation.GenerativeAI.LLM
                 string json = await httpTool.PostAsync(config.CompletionsUrl, jsonPayload);
 
                 var response = serializer.Deserialize<ChatResponse>(json);
+                
+                //update usage tokens
+                Interlocked.Add(ref promptTokens, response.usage.prompt_tokens);
+                Interlocked.Add(ref completionTokens, response.usage.completion_tokens);
+
                 var llmResponse = ToLLMResponse(response);
+
+                //Log info
                 Logger.WriteLog(LogLevel.Info, LogOps.Response, llmResponse.Response);
+                Logger.WriteLog(LogLevel.Info, LogOps.Response, $"Prompts Tokens: {response.usage.prompt_tokens}, Completion Tokens: {response.usage.completion_tokens}");
+                
                 return llmResponse; 
             }
             catch (Exception ex)
